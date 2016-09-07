@@ -35,3 +35,5 @@ function generateArray() {
 
     return wholeArray;
 }
+
+printArray(generateArray());
