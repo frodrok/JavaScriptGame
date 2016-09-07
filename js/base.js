@@ -24,7 +24,7 @@ function checkKey(e) {
 
 function printArray(multiArray) {
 
-    console.log(multiArray);
+    console.log(multiArray.join());
 }
 
 function generateArray() {
