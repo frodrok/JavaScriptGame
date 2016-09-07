@@ -26,3 +26,12 @@ function printArray(multiArray) {
 
     console.log(multiArray);
 }
+
+function generateArray() {
+    var firstRow = ['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#' ];
+    var wholeArray = [firstRow, firstRow, firstRow, firstRow, firstRow,
+        firstRow, firstRow,firstRow,firstRow,firstRow,
+        firstRow,firstRow,firstRow,firstRow,firstRow];
+
+    return wholeArray;
+}
