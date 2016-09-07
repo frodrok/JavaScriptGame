@@ -22,3 +22,12 @@ function checkKey(e) {
     }
 
 }
+
+function generateArray() {
+    var firstRow = ['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#' ];
+    var wholeArray = [firstRow, firstRow, firstRow, firstRow, firstRow,
+        firstRow, firstRow,firstRow,firstRow,firstRow,
+        firstRow,firstRow,firstRow,firstRow,firstRow];
+
+    return wholeArray;
+}
