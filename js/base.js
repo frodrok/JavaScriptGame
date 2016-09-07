@@ -20,5 +20,9 @@ function checkKey(e) {
     else if (e.keyCode == '39') {
         // right arrow
     }
+}
 
+function printArray(multiArray) {
+
+    console.log(multiArray);
 }
