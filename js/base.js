@@ -2,6 +2,10 @@ console.log("start");
 
 document.onkeydown = checkKey;
 
+var map = generateArray();
+
+map[3][3] = '@';
+
 function checkKey(e) {
 
     e = e || window.event;
@@ -9,7 +13,9 @@ function checkKey(e) {
     console.log(e);
 
     if (e.keyCode == '38') {
-        // up arrow
+        console.clear();
+        printArray(map);
+
     }
     else if (e.keyCode == '40') {
         // down arrow
@@ -24,16 +30,21 @@ function checkKey(e) {
 
 function printArray(multiArray) {
 
-    console.log(multiArray.join());
+    for(var i = 0; i < multiArray.length; i++) {
+        console.log(i + " " + multiArray[i].join(" "));
+    }
+    // console.log(multiArray);
 }
 
 function generateArray() {
-    var firstRow = ['#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#', '#' ];
-    var wholeArray = [firstRow, firstRow, firstRow, firstRow, firstRow,
-        firstRow, firstRow,firstRow,firstRow,firstRow,
-        firstRow,firstRow,firstRow,firstRow,firstRow];
+    var wholeArray = new Array(15);
+    for (var i = 0; i < 15; i++) {
+        var oneRow = new Array(15);
+        for(var j = 0; j < 15; j++) {
+            oneRow[j] = '#';
+        }
+        wholeArray[i] = oneRow;
+    }
 
     return wholeArray;
 }
-
-printArray(generateArray());
