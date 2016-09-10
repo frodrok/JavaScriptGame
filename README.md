@@ -1,2 +1,6 @@
 # Javascript game for school project
-Thanks Tom
+
+To play the game in it's proper glory:
+* Open index.htm in chrome
+* Open chrome developer console
+* Enable timestamps and uncheck 'Preserve log'
