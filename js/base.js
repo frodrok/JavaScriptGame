@@ -7,25 +7,31 @@ var mapLayout = {walls: '#', floor: '.', key: '~'};
 var player = {symbol: '@', x: 3, y: 3};
 var monster = {symbol: 'X', x: 1, y: 2};
 
-var playing = true;
+var playing = false;
 
-while (playing) {
+function startGame() {
 
-    console.clear();
-    updateMap();
-    printArray(map);
+    playing = true;
 
-    var input = prompt('Which direction would you like to go? [u]p, [d]own, [l]eft or [r]ight. Enter [s]top to stop getting prompts.');
+    while (playing) {
 
-    handleInput(input);
+        console.clear();
+        updateMap();
+        printArray(map);
 
+        var input = prompt('Which direction would you like to go? [u]p, [d]own, [l]eft or [r]ight. Enter [s]top to stop getting prompts.');
+
+        handleInput(input);
+    }
 }
 
 function handleInput(input) {
-    switch(input) {
+    switch (input) {
+
         case 'u':
             moveUp();
             break;
+
         case 'd':
             moveDown();
             break;
@@ -33,6 +39,7 @@ function handleInput(input) {
         case 'l':
             moveLeft();
             break;
+
         case 'r':
             moveRight();
             break;
@@ -69,7 +76,7 @@ function updateMap() {
 
 /* prints out the map to the console */
 function printArray(multiArray) {
-    for(var i = 0; i < multiArray.length; i++) {
+    for (var i = 0; i < multiArray.length; i++) {
         console.log(multiArray[i].join(''));
     }
 }
@@ -82,7 +89,7 @@ function generateMap() {
     for (var i = 0; i < 15; i++) {
         var oneRow = new Array(15);
 
-        for(var j = 0; j < 15; j++) {
+        for (var j = 0; j < 15; j++) {
 
             /* first and last row should be '#' for walls */
             if (i == 0 || i == 14) {
