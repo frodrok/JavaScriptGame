@@ -12,12 +12,13 @@ var playing = false;
 function startGame() {
     playing = true;
     generateMap();
+    createTrails();
 
     while (playing) {
 
         console.clear();
         updateMap();
-        printArray(map);
+        printMap(map);
 
         var input = prompt('Which direction would you like to go? [u]p, [d]own, [l]eft or [r]ight. Enter [s]top to stop getting prompts.');
 
@@ -69,7 +70,7 @@ function moveDown() {
 }
 
 /* the player tile becomes a floor tile after the player left */
-function replacePlayerToTrail(){
+function replacePlayerToTrail() {
     map[player.x][player.y] = mapLayout.floor;
 }
 
@@ -81,9 +82,9 @@ function updateMap() {
 }
 
 /* prints out the map to the console */
-function printArray(multiArray) {
-    for (var i = 0; i < multiArray.length; i++) {
-        console.log(multiArray[i].join(''));
+function printMap(map) {
+    for (var i = 0; i < map.length; i++) {
+        console.log(map[i].join(' '));
     }
 }
 
@@ -102,14 +103,14 @@ function generateMap() {
                 oneRow[j] = mapLayout.walls;
             } else {
 
-                var randomTile = createTrails();
+                var chosenTile = chooseFloorOrWall();
 
                 /* left most tile and right most tile should be wall */
                 if (j == 0 || j == 14) {
                     oneRow[j] = mapLayout.walls;
                 } else {
                     // oneRow[j] = mapLayout.floor;
-                    oneRow[j] = randomTile;
+                    oneRow[j] = chosenTile;
                 }
             }
         }
@@ -122,7 +123,37 @@ function generateMap() {
 }
 
 /* get a random value to generate a floor or a wall tile randomly */
-function createTrails(){
+function chooseFloorOrWall() {
 
     return Math.random() < 0.5 ? mapLayout.floor : mapLayout.walls;
+}
+
+function getRandomMapIndex() {
+
+    return Math.floor((Math.random() * 13) + 1);
+}
+
+function createTrails() {
+
+    var randomIndex = getRandomMapIndex();
+
+    map.forEach(function (elementX, indexX) {
+
+        elementX.forEach(function (elementY, indexY) {
+
+            if (!isWall(indexX, indexY) && (randomIndex === indexX || player.x === indexX)) {
+
+                map[indexX][indexY] = mapLayout.floor;
+            }
+            if (!isWall(indexX, indexY) && (player.y === indexY)) {
+
+                map[indexX][indexY] = mapLayout.floor;
+            }
+        })
+    })
+}
+
+function isWall(indexX, indexY) {
+
+    return indexX === 0 || indexX === 14 || indexY === 0 || indexY === 14;
 }
