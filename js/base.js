@@ -3,15 +3,18 @@
 var map = null;
 
 /* javascript objects for the game */
-var mapLayout = {walls: '#', floor: '.', key: '~'};
+var mapLayout = {walls: '#', floor: '.'};
 var player = {symbol: '@', x: 3, y: 3};
 var monster = {symbol: 'X', x: 1, y: 2};
+var key = {symbol: '~', x: 10, y: 13};
 
 var playing = false;
 
 function startGame() {
+
     playing = true;
     generateMap();
+    setObjectsLocation();
     createTrails();
 
     while (playing) {
@@ -79,6 +82,7 @@ function updateMap() {
     // map = generateMap();
     map[monster.x][monster.y] = monster.symbol;
     map[player.x][player.y] = player.symbol;
+    map[key.x][key.y] = key.symbol;
 }
 
 /* prints out the map to the console */
@@ -141,10 +145,13 @@ function createTrails() {
 
         elementX.forEach(function (elementY, indexY) {
 
+            /* make a random row and the row where the player exists a trail */
             if (!isWall(indexX, indexY) && (randomIndex === indexX || player.x === indexX)) {
 
                 map[indexX][indexY] = mapLayout.floor;
             }
+
+            /* make the column where the player exists a trail */
             if (!isWall(indexX, indexY) && (player.y === indexY)) {
 
                 map[indexX][indexY] = mapLayout.floor;
@@ -156,4 +163,14 @@ function createTrails() {
 function isWall(indexX, indexY) {
 
     return indexX === 0 || indexX === 14 || indexY === 0 || indexY === 14;
+}
+
+function setObjectsLocation(){
+
+    player.x = getRandomMapIndex();
+    player.y = getRandomMapIndex();
+    monster.x = getRandomMapIndex();
+    monster.y = getRandomMapIndex();
+    key.x = getRandomMapIndex();
+    key.y = getRandomMapIndex();
 }
