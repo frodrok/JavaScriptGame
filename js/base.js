@@ -25,13 +25,18 @@ function startGame() {
 
         var input = prompt('Which direction would you like to go? [u]p, [d]own, [l]eft or [r]ight. Enter [s]top to stop getting prompts.');
 
-        replacePlayerToTrail();
+        replacePlayerToFloor();
+
+        if(input != null) {
+            input.toLowerCase();
+        }
+
         handleInput(input);
     }
 }
 
 function handleInput(input) {
-    switch (input) {
+    switch (input.toLowerCase()) {
 
         case 'u':
             moveUp();
@@ -73,7 +78,7 @@ function moveDown() {
 }
 
 /* the player tile becomes a floor tile after the player left */
-function replacePlayerToTrail() {
+function replacePlayerToFloor() {
     map[player.x][player.y] = mapLayout.floor;
 }
 
@@ -165,7 +170,7 @@ function isWall(indexX, indexY) {
     return indexX === 0 || indexX === 14 || indexY === 0 || indexY === 14;
 }
 
-function setObjectsLocation(){
+function setObjectsLocation() {
 
     player.x = getRandomMapIndex();
     player.y = getRandomMapIndex();
