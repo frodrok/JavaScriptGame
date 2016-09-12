@@ -3,7 +3,7 @@
 var map = null;
 
 /* javascript objects for the game */
-var mapLayout = {walls: '#', floor: ' '};
+var mapLayout = {walls:  String.fromCharCode(0x2B1B), floor: String.fromCharCode(0x2B1C)};
 var player = {symbol: String.fromCharCode(0xD83D, 0xDE04), x: 3, y: 3};
 var monster = {symbol: String.fromCharCode(0xD83D, 0xDC79), x: 1, y: 2};
 var key = {symbol: String.fromCharCode(0xD83D, 0xDD11), x: 10, y: 13};
