@@ -8,8 +8,11 @@ var player = {symbol: String.fromCharCode(0xD83D, 0xDE04), x: 3, y: 3};
 var monster = {symbol: String.fromCharCode(0xD83D, 0xDC79), x: 1, y: 2};
 var key = {symbol: String.fromCharCode(0xD83D, 0xDD11), x: 10, y: 13};
 var hammer = {symbol: String.fromCharCode(0xD83D, 0xDD28), x: 5, y: 8};
+var door = {symbol: 'D'};
 
 var playing = false;
+
+createDoor();
 
 function startGame() {
 
@@ -89,6 +92,7 @@ function updateMap() {
     map[key.x][key.y] = key.symbol;
     map[hammer.x][hammer.y] = hammer.symbol;
     replacePlayerToFloor();
+    map[door.x][door.y] = door.symbol;
 }
 
 /* prints out the map to the console */
@@ -175,4 +179,25 @@ function setObjectsLocation() {
     key.y = getRandomMapIndex();
     hammer.x = getRandomMapIndex();
     hammer.y = getRandomMapIndex();
+}
+
+function getRandomIntToCreateDoor(minNumber, maxNumber) {
+  return Math.floor(Math.random() * (maxNumber - minNumber)) + minNumber;
+}
+
+function createDoor(){
+  door.x = getRandomIntToCreateDoor(0, 15);
+  var doorPositionChoice = getRandomIntToCreateDoor(0,15);
+  if (door.x == 0 || door.x == 14){
+    door.y = doorPositionChoice;
+  }
+  else{
+    if (doorPositionChoice < 7)
+    {
+      door.y = 0;
+    }
+    else {
+      door.y = 14;
+    }
+  }
 }
