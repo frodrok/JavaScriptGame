@@ -7,6 +7,7 @@ var mapLayout = {walls:  String.fromCharCode(0x2B1B), floor: String.fromCharCode
 var player = {symbol: String.fromCharCode(0xD83D, 0xDE04), x: 3, y: 3};
 var monster = {symbol: String.fromCharCode(0xD83D, 0xDC79), x: 1, y: 2};
 var key = {symbol: String.fromCharCode(0xD83D, 0xDD11), x: 10, y: 13};
+var hammer = {symbol: String.fromCharCode(0xD83D, 0xDD28), x: 5, y: 8};
 
 var playing = false;
 
@@ -24,8 +25,6 @@ function startGame() {
         printMap(map);
 
         var input = prompt('Which direction would you like to go? [u]p, [d]own, [l]eft or [r]ight. Enter [s]top to stop getting prompts.');
-
-        replacePlayerToFloor();
 
         if(input != null) {
             input.toLowerCase();
@@ -88,6 +87,8 @@ function updateMap() {
     map[monster.x][monster.y] = monster.symbol;
     map[player.x][player.y] = player.symbol;
     map[key.x][key.y] = key.symbol;
+    map[hammer.x][hammer.y] = hammer.symbol;
+    replacePlayerToFloor();
 }
 
 /* prints out the map to the console */
@@ -150,14 +151,8 @@ function createTrails() {
 
         elementX.forEach(function (elementY, indexY) {
 
-            /* make a random row and the row where the player exists a trail */
-            if (!isWall(indexX, indexY) && (randomIndex === indexX || player.x === indexX)) {
-
-                map[indexX][indexY] = mapLayout.floor;
-            }
-
-            /* make the column where the player exists a trail */
-            if (!isWall(indexX, indexY) && (player.y === indexY)) {
+            /* make the key row, player row, player column a floor tile */
+            if (!isOuterWall(indexX, indexY) && (indexX === hammer.x || indexX === player.x || player.y === indexY)) {
 
                 map[indexX][indexY] = mapLayout.floor;
             }
@@ -165,7 +160,7 @@ function createTrails() {
     })
 }
 
-function isWall(indexX, indexY) {
+function isOuterWall(indexX, indexY) {
 
     return indexX === 0 || indexX === 14 || indexY === 0 || indexY === 14;
 }
@@ -178,4 +173,6 @@ function setObjectsLocation() {
     monster.y = getRandomMapIndex();
     key.x = getRandomMapIndex();
     key.y = getRandomMapIndex();
+    hammer.x = getRandomMapIndex();
+    hammer.y = getRandomMapIndex();
 }
