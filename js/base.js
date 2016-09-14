@@ -8,16 +8,16 @@ var player = {symbol: String.fromCharCode(0xD83D, 0xDE04), x: 3, y: 3};
 var monster = {symbol: String.fromCharCode(0xD83D, 0xDC79), x: 1, y: 2};
 var key = {symbol: String.fromCharCode(0xD83D, 0xDD11), x: 10, y: 13};
 var hammer = {symbol: String.fromCharCode(0xD83D, 0xDD28), x: 5, y: 8};
-var door = {symbol: 'D'};
+var door = {symbol: String.fromCharCode(0xD83D, 0xDEAA)};
 
 var playing = false;
 
-createDoor();
 
 function startGame() {
 
     playing = true;
     generateMap();
+    createDoor();
     setObjectsLocation();
     createTrails();
 
@@ -26,6 +26,7 @@ function startGame() {
         console.clear();
         updateMap();
         printMap(map);
+        replacePlayerToFloor();
 
         var input = prompt('Which direction would you like to go? [u]p, [d]own, [l]eft or [r]ight. Enter [s]top to stop getting prompts.');
 
@@ -38,7 +39,7 @@ function startGame() {
 }
 
 function handleInput(input) {
-    switch (input.toLowerCase()) {
+    switch (input) {
 
         case 'u':
             moveUp();
@@ -91,7 +92,6 @@ function updateMap() {
     map[player.x][player.y] = player.symbol;
     map[key.x][key.y] = key.symbol;
     map[hammer.x][hammer.y] = hammer.symbol;
-    replacePlayerToFloor();
     map[door.x][door.y] = door.symbol;
 }
 
