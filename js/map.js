@@ -1,33 +1,43 @@
-var Map = function() {
-    var that = {};
+function baseMap() {
 
     var floor = String.fromCharCode(0x2B1C);
-    var walls = String.fromCharCode(0x2B1B);
-    that.player = new Player(3, 3);
+    var wall = String.fromCharCode(0x2B1B);
+    var player = new Player(3, 3);
     var monster = new Monster(6, 6);
+    var mapSize = 15;
 
     var key = {symbol: String.fromCharCode(0xD83D, 0xDD11), x: 10, y: 13};
     var hammer = {symbol: String.fromCharCode(0xD83D, 0xDD28), x: 5, y: 8};
     var door = {symbol: String.fromCharCode(0xD83D, 0xDEAA)};
 
+    var map = generateBaseMap();
+    map[key.x][key.y] = key.symbol;
+
+    setObjectsLocation();
+    clearPlayerRowAndColumn();
+    clearAreaAndPutHammer();
+    setDoor();
+
     function generateBaseMap() {
-        var innerMap = new Array(15);
+        var innerMap = new Array(mapSize);
 
-        for (var i = 0; i < 15; i++) {
-            var oneRow = new Array(15);
+        for (var i = 0; i < mapSize; i++) {
+            var oneRow = new Array(mapSize);
 
-            for (var j = 0; j < 15; j++) {
+            for (var j = 0; j < mapSize; j++) {
+
+                var lastIndex = mapSize - 1;
 
                 /* first and last row should be '#' for walls */
-                if (i == 0 || i == 14) {
-                    oneRow[j] = walls;
+                if (i == 0 || i == lastIndex) {
+                    oneRow[j] = wall;
                 } else {
 
                     var chosenTile = chooseFloorOrWall();
 
                     /* left most tile and right most tile should be wall */
-                    if (j == 0 || j == 14) {
-                        oneRow[j] = walls;
+                    if (j == 0 || j == lastIndex) {
+                        oneRow[j] = wall;
                     } else {
                         oneRow[j] = chosenTile;
                     }
@@ -41,32 +51,29 @@ var Map = function() {
     }
 
     function chooseFloorOrWall() {
-        return Math.random() < 0.5 ? floor : walls;
+        return Math.random() < 0.5 ? floor : wall;
     }
 
-    that.map = generateBaseMap();
-
     function putPlayer() {
-        that.map[that.player.x][that.player.y] = that.player.symbol;
+        map[player.x][player.y] = player.symbol;
     }
 
     function putMonster() {
-        that.map[monster.x][monster.y] = monster.symbol;
+        map[monster.x][monster.y] = monster.symbol;
     }
 
-    function getRandomIntToCreateDoor(minNumber, maxNumber) {
+    function getRandomInt(minNumber, maxNumber) {
         return Math.floor(Math.random() * (maxNumber - minNumber)) + minNumber;
     }
 
     function setDoor() {
-        door.x = getRandomIntToCreateDoor(0, 15);
-        var doorPositionChoice = getRandomIntToCreateDoor(0,15);
-        if (door.x == 0 || door.x == 14){
+        door.x = getRandomInt(0, 15);
+        var doorPositionChoice = getRandomInt(0, 15);
+        if (door.x == 0 || door.x == 14) {
             door.y = doorPositionChoice;
         }
-        else{
-            if (doorPositionChoice < 7)
-            {
+        else {
+            if (doorPositionChoice < 7) {
                 door.y = 0;
             }
             else {
@@ -74,79 +81,92 @@ var Map = function() {
             }
         }
 
-        that.map[door.x][door.y] = door.symbol;
-
+        map[door.x][door.y] = door.symbol;
     }
 
     function clearAreaAndPutHammer() {
-        var areaToClear = [[hammer.x - 1, hammer.y - 1], [hammer.x, hammer.y], [hammer.x + 1, hammer.y + 1]];
+        // var areaToClear = [[hammer.x - 1, hammer.y - 1], [hammer.x, hammer.y], [hammer.x + 1, hammer.y + 1]];
+        //
+        // areaToClear.forEach(function (e) {
+        //     map[e[0]][e[1]] = floor;
+        // });
 
-        areaToClear.forEach(function(e) {
-            that.map[e[0]][e[1]] = floor;
-        });
-
-        that.map[hammer.x][hammer.y] = hammer.symbol;
+        map[hammer.x][hammer.y] = hammer.symbol;
     }
 
     function clearMap() {
         /* TODO */
     }
 
-    function isOuterWall(indexX, indexY) {
+    function clearPlayerRowAndColumn() {
 
-            return indexX === 0 || indexX === 14 || indexY === 0 || indexY === 14;
+        map.forEach(function (elementX, indexX) {
+
+            elementX.forEach(function (elementY, indexY) {
+
+                /* make the player row floor tiles */
+                if (!isOuterWall(indexX, indexY) && (indexX === hammer.x || indexY === player.y)) {
+
+                    map[indexX][indexY] = floor;
+                }
+            })
+        })
     }
 
-    that.map[key.x][key.y] = key.symbol;
+    function isOuterWall(indexX, indexY) {
 
-    clearAreaAndPutHammer();
-    setDoor();
+        return indexX === 0 || indexX === 14 || indexY === 0 || indexY === 14;
+    }
 
-    that.printMap = function() {
-        for (var i = 0; i < this.map.length; i++) {
-            console.log(this.map[i].join(' '));
-        }
-    };
+    function setObjectsLocation() {
+        var firstIndexOfInnerMap = 1;
+        var lastIndexOfInnerMap = 13;
+        var objects = [];
+        objects.push(player, monster, key, hammer);
+        objects.forEach(function (element) {
+            element.x = getRandomInt(firstIndexOfInnerMap, lastIndexOfInnerMap);
+            element.y = getRandomInt(firstIndexOfInnerMap, lastIndexOfInnerMap);
+        });
+    }
 
-    /* a start of collision detection, for now it only checks for walls */
-    that.isAvailable = function(direction, x, y) {
-        console.log(direction);
-        var available = false;
-        if (direction === 'w') {
-            if (that.map[x-1][y] === walls) {
-                available = false;
-            } else {
-                available = true;
-            }
-        } else if (direction === 'a') {
-            if (that.map[x][y-1] === walls) {
-                available = false;
-            } else {
-                available = true;
-            }
-        } else if (direction === 's') {
-            if (that.map[x+1][y] === walls) {
-                available = false;
-            } else {
-                available = true;
-            }
-        } else if (direction === 'd') {
-            if (that.map[x][y+1] === walls) {
-                available = false;
-            } else {
-                available = true;
-            }
-        }
-
-        return available;
-    };
-
-    that.update = function() {
+    function update() {
         // clearMap();
         putPlayer();
         putMonster();
-        console.log("updated, player.x:" + that.player.x + ", p.y:" + that.player.y);
-    };
+        console.log("updated, player.x:" + player.x + ", p.y:" + player.y);
+    }
 
-    return that;
-};
+    function replacePlayerToFloor() {
+        map[player.x][player.y] = floor;
+    }
+
+    /* a start of collision detection, for now it only checks for walls */
+    function isAvailable(direction, x, y) {
+        console.log(direction);
+        var available = false;
+        if (direction === 'w') {
+            available = (map[x - 1][y] !== wall);
+        } else if (direction === 'a') {
+            available = (map[x][y - 1] !== wall);
+        } else if (direction === 's') {
+            available = (map[x + 1][y] !== wall);
+        } else if (direction === 'd') {
+            available = (map[x][y + 1] !== wall);
+        }
+        return available;
+    }
+
+    function printMap() {
+        for (var i = 0; i < map.length; i++) {
+            console.log(map[i].join(' '));
+        }
+    }
+
+    return {
+        player: player,
+        update: update,
+        replacePlayerToFloor: replacePlayerToFloor,
+        isAvailable: isAvailable,
+        printMap: printMap
+    }
+}
