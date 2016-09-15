@@ -11,7 +11,7 @@ function startGame() {
         console.clear();
         baseMap.update();
         baseMap.printMap();
-        baseMap.replacePlayerToFloor();
+        baseMap.replaceOldTiles();
         baseMap.moveMonster();
 
         var input = prompt('Which direction would you like to go? [w]: up, [s]: down, [a]: left or [d]: right. Enter [q] to stop getting prompts.');

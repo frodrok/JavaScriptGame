@@ -8,10 +8,11 @@ var Map = function() {
     var mapSize = 15;
 
     var key = {symbol: String.fromCharCode(0xD83D, 0xDD11), x: 10, y: 13};
-    var hammer = {symbol: String.fromCharCode(0xD83D, 0xDD28), x: 5, y: 8};
+    var hammer = {symbol: String.fromCharCode(0xD83D, 0xDD28), x: 5, y: 8, pickedUp: false};
     var door = {symbol: String.fromCharCode(0xD83D, 0xDEAA)};
 
     function generateBaseMap() {
+        var currentInnerWalls = 0; /* there's too many walls inside i think, i always get stuck */
         var innerMap = new Array(mapSize);
 
         for (var i = 0; i < mapSize; i++) {
@@ -42,12 +43,19 @@ var Map = function() {
     }
 
     function chooseFloorOrWall() {
-        return Math.random() < 0.5 ? floor : walls;
+        /* we can increase factor here for less or more walls,
+         * 0 = all walls, 0.5 = 50% walls, 0.65 = 35% walls */
+        return Math.random() < 0.75 ? floor : walls;
     }
 
     that.map = generateBaseMap();
 
     function putPlayer() {
+        var p = that.player;
+        if (p.x === hammer.x && p.y === hammer.y) {
+            p.hasHammer = true;
+            hammer.pickedUp = true;
+        }
         that.map[that.player.x][that.player.y] = that.player.symbol;
     }
 
@@ -79,14 +87,12 @@ var Map = function() {
 
     }
 
-    function clearAreaAndPutHammer() {
-        var areaToClear = [[hammer.x - 1, hammer.y - 1], [hammer.x, hammer.y], [hammer.x + 1, hammer.y + 1]];
 
-        areaToClear.forEach(function(e) {
-            that.map[e[0]][e[1]] = floor;
-        });
 
-        that.map[hammer.x][hammer.y] = hammer.symbol;
+    function putHammer() {
+        if (hammer.pickedUp === false) {
+            that.map[hammer.x][hammer.y] = hammer.symbol;
+        }
     }
 
     function clearMap() {
@@ -100,12 +106,12 @@ var Map = function() {
 
     that.map[key.x][key.y] = key.symbol;
 
-    clearAreaAndPutHammer();
+    putHammer();
     setDoor();
 
     that.printMap = function() {
-        for (var i = 0; i < this.map.length; i++) {
-            console.log(this.map[i].join(' '));
+        for (var i = 0; i < that.map.length; i++) {
+            console.log(that.map[i].join(' '));
         }
     };
 
@@ -114,35 +120,25 @@ var Map = function() {
         console.log(direction);
         var available = false;
         if (direction === 'w') {
-            if (that.map[x-1][y] === walls) {
-                available = false;
-            } else {
-                available = true;
-            }
+            available = that.map[x - 1][y] !== walls;
         } else if (direction === 'a') {
-            if (that.map[x][y-1] === walls) {
-                available = false;
-            } else {
-                available = true;
-            }
+            available = that.map[x][y - 1] !== walls;
         } else if (direction === 's') {
-            if (that.map[x+1][y] === walls) {
-                available = false;
-            } else {
-                available = true;
-            }
+            available = that.map[x + 1][y] !== walls;
         } else if (direction === 'd') {
-            if (that.map[x][y+1] === walls) {
-                available = false;
-            } else {
-                available = true;
-            }
+            available = that.map[x][y + 1] !== walls;
         }
 
         return available;
     };
 
+    function logStatus() {
+        console.log("p.x: " + that.player.x + ", p.y: " + that.player.y + ", hasHammer: " + that.player.hasHammer);
+        console.log("m.x: " + monster.x + ", m.y: " + monster.y);
+
+    }
     that.replacePlayerToFloor = function () {
+        that.map[monster.x][monster.y] = floor;
         that.map[that.player.x][that.player.y] = floor;
     };
 
@@ -153,26 +149,45 @@ var Map = function() {
 
     that.update = function() {
         // clearMap();
+        // that.replaceOldTiles();
         putPlayer();
         putMonster();
-        console.log("updated, player.x:" + that.player.x + ", p.y:" + that.player.y);
+        putHammer();
+
+        logStatus();
     };
 
     that.moveMonster = function () {
         var moveX = getRandomIntBetween(0, 2);
         var moveY = getRandomIntBetween(0, 2);
 
-        switch (moveX) {
-            case 0: monster.moveUp(); break;
+        switch (moveY) {
+            case 0:
+                if (that.isAvailable('w', monster.x, monster.y)) {
+                    monster.moveUp();
+                }
+                break;
             case 1: break; /* dont move on the X axis */
-            case 2: monster.moveDown(); break;
+            case 2:
+                if (that.isAvailable('s', monster.x, monster.y)) {
+                    monster.moveDown();
+                }
+                break;
             default: throw new Error("value was way off");
         }
 
-        switch (moveY) {
-            case 0: monster.moveLeft(); break;
+        switch (moveX) {
+            case 0:
+                if (that.isAvailable('a', monster.x, monster.y)) {
+                    monster.moveLeft();
+                }
+                break;
             case 1: break; /* dont move on the Y axis */
-            case 2: monster.moveRight(); break;
+            case 2:
+                if (that.isAvailable('d', monster.x, monster.y)) {
+                    monster.moveRight();
+                }
+                break;
             default: throw new Error("value was way off");
         }
 
