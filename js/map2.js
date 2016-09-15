@@ -10,6 +10,15 @@ var map = function () {
     var hammer = {symbol: String.fromCharCode(0xD83D, 0xDD28), x: 5, y: 8};
     var door = {symbol: String.fromCharCode(0xD83D, 0xDEAA)};
 
+    var map = generateBaseMap();
+
+    map[key.x][key.y] = key.symbol;
+
+    setObjectsLocation();
+    clearPlayerRowAndColumn();
+    clearAreaAndPutHammer();
+    setDoor();
+
     function generateBaseMap() {
         var innerMap = new Array(mapSize);
 
@@ -19,7 +28,7 @@ var map = function () {
             for (var j = 0; j < mapSize; j++) {
 
                 var lastIndex = mapSize - 1;
-                
+
                 /* first and last row should be '#' for walls */
                 if (i == 0 || i == lastIndex) {
                     oneRow[j] = walls;
@@ -41,8 +50,6 @@ var map = function () {
 
         return innerMap;
     }
-
-    var map = generateBaseMap();
 
     function chooseFloorOrWall() {
         return Math.random() < 0.5 ? floor : walls;
@@ -92,14 +99,14 @@ var map = function () {
         /* TODO */
     }
 
-    function clearPlayerRow() {
+    function clearPlayerRowAndColumn() {
 
         map.forEach(function (elementX, indexX) {
 
             elementX.forEach(function (elementY, indexY) {
 
                 /* make the player row floor tiles */
-                if (!isOuterWall(indexX, indexY) && (indexX === player.x )) {
+                if (!isOuterWall(indexX, indexY) && (indexX === player.x || indexY === player.y)) {
 
                     map[indexX][indexY] = floor;
                 }
@@ -124,43 +131,44 @@ var map = function () {
         });
     }
 
-    map[key.x][key.y] = key.symbol;
+    function update() {
+        // clearMap();
+        putPlayer();
+        putMonster();
+        console.log("updated, player.x:" + player.x + ", p.y:" + player.y);
+    }
 
-    setObjectsLocation();
-    clearPlayerRow();
-    clearAreaAndPutHammer();
-    setDoor();
+    function replacePlayerToFloor() {
+        map[player.x][player.y] = floor;
+    }
+
+    /* a start of collision detection, for now it only checks for walls */
+    function isAvailable (direction, x, y) {
+        console.log(direction);
+        var available = false;
+        if (direction === 'w') {
+            available = map[x - 1][y] !== walls;
+        } else if (direction === 'a') {
+            available = map[x][y - 1] !== walls;
+        } else if (direction === 's') {
+            available = map[x + 1][y] !== walls;
+        } else if (direction === 'd') {
+            available = map[x][y + 1] !== walls;
+        }
+        return available;
+    }
+
+    function printMap() {
+        for (var i = 0; i < map.length; i++) {
+            console.log(map[i].join(' '));
+        }
+    }
 
     return {
         player: player,
-        update: function () {
-            // clearMap();
-            putPlayer();
-            putMonster();
-            console.log("updated, player.x:" + player.x + ", p.y:" + player.y);
-        },
-        printMap: function () {
-            for (var i = 0; i < map.length; i++) {
-                console.log(map[i].join(' '));
-            }
-        },
-        replacePlayerToFloor: function () {
-            map[player.x][player.y] = floor;
-        },
-        /* a start of collision detection, for now it only checks for walls */
-        isAvailable: function (direction, x, y) {
-            console.log(direction);
-            var available = false;
-            if (direction === 'w') {
-                available = map[x - 1][y] !== walls;
-            } else if (direction === 'a') {
-                available = map[x][y - 1] !== walls;
-            } else if (direction === 's') {
-                available = map[x + 1][y] !== walls;
-            } else if (direction === 'd') {
-                available = map[x][y + 1] !== walls;
-            }
-            return available;
-        }
+        update: update,
+        replacePlayerToFloor: replacePlayerToFloor,
+        isAvailable: isAvailable,
+        printMap: printMap
     }
 };

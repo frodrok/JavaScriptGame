@@ -2,7 +2,6 @@
 var baseMap = map();
 
 var playing = false;
-
 function startGame() {
     playing = true;
     while (playing) {
@@ -14,7 +13,7 @@ function startGame() {
 
         var input = prompt('Which direction would you like to go? [w]: up, [s]: down, [a]: left or [d]: right. Enter [q] to stop getting prompts.');
 
-        if(input != null) {
+        if (input != null) {
             input.toLowerCase();
         }
 
