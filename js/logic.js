@@ -1,5 +1,5 @@
 // var baseMap = new Map();
-var baseMap = map();
+var baseMap = baseMap();
 
 var playing = false;
 function startGame() {

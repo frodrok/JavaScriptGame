@@ -1,4 +1,4 @@
-var map = function () {
+function baseMap() {
 
     var floor = String.fromCharCode(0x2B1C);
     var walls = String.fromCharCode(0x2B1B);
@@ -11,7 +11,6 @@ var map = function () {
     var door = {symbol: String.fromCharCode(0xD83D, 0xDEAA)};
 
     var map = generateBaseMap();
-
     map[key.x][key.y] = key.symbol;
 
     setObjectsLocation();
@@ -171,4 +170,4 @@ var map = function () {
         isAvailable: isAvailable,
         printMap: printMap
     }
-};
+}
