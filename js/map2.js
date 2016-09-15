@@ -1,7 +1,7 @@
 function baseMap() {
 
     var floor = String.fromCharCode(0x2B1C);
-    var walls = String.fromCharCode(0x2B1B);
+    var wall = String.fromCharCode(0x2B1B);
     var player = new Player(3, 3);
     var monster = new Monster(6, 6);
     var mapSize = 15;
@@ -30,14 +30,14 @@ function baseMap() {
 
                 /* first and last row should be '#' for walls */
                 if (i == 0 || i == lastIndex) {
-                    oneRow[j] = walls;
+                    oneRow[j] = wall;
                 } else {
 
                     var chosenTile = chooseFloorOrWall();
 
                     /* left most tile and right most tile should be wall */
                     if (j == 0 || j == lastIndex) {
-                        oneRow[j] = walls;
+                        oneRow[j] = wall;
                     } else {
                         oneRow[j] = chosenTile;
                     }
@@ -51,7 +51,7 @@ function baseMap() {
     }
 
     function chooseFloorOrWall() {
-        return Math.random() < 0.5 ? floor : walls;
+        return Math.random() < 0.5 ? floor : wall;
     }
 
     function putPlayer() {
@@ -146,13 +146,13 @@ function baseMap() {
         console.log(direction);
         var available = false;
         if (direction === 'w') {
-            available = map[x - 1][y] !== walls;
+            available = map[x - 1][y] !== wall;
         } else if (direction === 'a') {
-            available = map[x][y - 1] !== walls;
+            available = map[x][y - 1] !== wall;
         } else if (direction === 's') {
-            available = map[x + 1][y] !== walls;
+            available = map[x + 1][y] !== wall;
         } else if (direction === 'd') {
-            available = map[x][y + 1] !== walls;
+            available = map[x][y + 1] !== wall;
         }
         return available;
     }
