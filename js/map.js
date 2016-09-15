@@ -38,25 +38,25 @@ var Map = function() {
         }
 
         return innerMap;
-    };
+    }
 
     function chooseFloorOrWall() {
         return Math.random() < 0.5 ? floor : walls;
-    };
+    }
 
     that.map = generateBaseMap();
 
     function putPlayer() {
         that.map[that.player.x][that.player.y] = that.player.symbol;
-    };
+    }
 
     function putMonster() {
         that.map[monster.x][monster.y] = monster.symbol;
-    };
+    }
 
     function getRandomIntToCreateDoor(minNumber, maxNumber) {
         return Math.floor(Math.random() * (maxNumber - minNumber)) + minNumber;
-    };
+    }
 
     function setDoor() {
         door.x = getRandomIntToCreateDoor(0, 15);
@@ -76,7 +76,7 @@ var Map = function() {
 
         that.map[door.x][door.y] = door.symbol;
 
-    };
+    }
 
     function clearAreaAndPutHammer() {
         var areaToClear = [[hammer.x - 1, hammer.y - 1], [hammer.x, hammer.y], [hammer.x + 1, hammer.y + 1]];
@@ -86,16 +86,16 @@ var Map = function() {
         });
 
         that.map[hammer.x][hammer.y] = hammer.symbol;
-    };
+    }
 
     function clearMap() {
         /* TODO */
-    };
+    }
 
     function isOuterWall(indexX, indexY) {
 
             return indexX === 0 || indexX === 14 || indexY === 0 || indexY === 14;
-    };
+    }
 
     that.map[key.x][key.y] = key.symbol;
 
@@ -139,7 +139,7 @@ var Map = function() {
         }
 
         return available;
-    }
+    };
 
     that.update = function() {
         // clearMap();

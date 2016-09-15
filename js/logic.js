@@ -1,4 +1,5 @@
-var baseMap = new Map();
+// var baseMap = new Map();
+var baseMap = map();
 
 var playing = false;
 
@@ -9,6 +10,7 @@ function startGame() {
         console.clear();
         baseMap.update();
         baseMap.printMap();
+        baseMap.replacePlayerToFloor();
 
         var input = prompt('Which direction would you like to go? [w]: up, [s]: down, [a]: left or [d]: right. Enter [q] to stop getting prompts.');
 
@@ -18,38 +20,32 @@ function startGame() {
 
         handleInput(input);
     }
-};
+}
 
 function handleInput(input) {
 
-    var cleaned = input.toLowerCase();
-
-    switch (cleaned) {
+    switch (input) {
 
         case 'w':
-            var go = checkAvailable(cleaned);
-            if (go) {
+            if (floorIsAvailable(input)) {
                 baseMap.player.moveUp();
             }
             break;
 
         case 's':
-            var go = checkAvailable(cleaned);
-            if (go) {
+            if (floorIsAvailable(input)) {
                 baseMap.player.moveDown();
             }
             break;
 
         case 'a':
-            var go = checkAvailable(cleaned);
-            if (go) {
+            if (floorIsAvailable(input)) {
                 baseMap.player.moveLeft();
             }
             break;
 
         case 'd':
-            var go = checkAvailable(cleaned);
-            if (go) {
+            if (floorIsAvailable(input)) {
                 baseMap.player.moveRight();
             }
             break;
@@ -62,25 +58,27 @@ function handleInput(input) {
             console.log('Invalid input, get rekt.');
             break;
     }
+}
 
-};
-
-function checkAvailable(direction) {
+function floorIsAvailable(direction) {
 
     switch (direction) {
+
         case 'w':
             return baseMap.isAvailable('w', baseMap.player.x, baseMap.player.y);
             break;
+
         case 'a':
             return baseMap.isAvailable('a', baseMap.player.x, baseMap.player.y);
             break;
+
         case 's':
             return baseMap.isAvailable('s', baseMap.player.x, baseMap.player.y);
             break;
+
         case 'd':
             return baseMap.isAvailable('d', baseMap.player.x, baseMap.player.y);
             break;
-
     }
 }
 
