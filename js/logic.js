@@ -1,5 +1,6 @@
-// var baseMap = new Map();
-var baseMap = map();
+
+var baseMap = new Map();
+// var baseMap = map();
 
 var playing = false;
 
@@ -11,6 +12,7 @@ function startGame() {
         baseMap.update();
         baseMap.printMap();
         baseMap.replacePlayerToFloor();
+        baseMap.moveMonster();
 
         var input = prompt('Which direction would you like to go? [w]: up, [s]: down, [a]: left or [d]: right. Enter [q] to stop getting prompts.');
 
