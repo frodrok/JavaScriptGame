@@ -8,7 +8,7 @@ function startGame() {
         console.clear();
         baseMap.update();
         baseMap.printMap();
-        baseMap.replacePlayerToFloor();
+        baseMap.replaceObjectToFloor(baseMap.player);
 
         var input = prompt('Which direction would you like to go? [w]: up, [s]: down, [a]: left or [d]: right. Enter [q] to stop getting prompts.');
 

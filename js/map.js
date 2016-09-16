@@ -14,12 +14,12 @@ function baseMap() {
     var objects = [player, key, hammer, monster, sword];
     var map = generateBaseMap();
     var playerItems = player.items;
+    player.life = 3;
+    monster.dead = false;
 
     setObjectsLocation();
     clearPlayerColumnAndHammerRow();
-    // clearAreaAndPutHammer();
     putItems();
-    // map[key.x][key.y] = key.symbol;
     setDoor();
 
     function generateBaseMap() {
@@ -56,11 +56,12 @@ function baseMap() {
         return Math.random() < 0.5 ? thing1 : thing2;
     }
 
-    function putItems(){
-        items.forEach(function(item){
+    function putItems() {
+        items.forEach(function (item) {
             map[item.x][item.y] = item.symbol;
         })
     }
+
     function putPlayer() {
         map[player.x][player.y] = player.symbol;
     }
@@ -83,16 +84,6 @@ function baseMap() {
         }
         map[door.x][door.y] = door.symbol;
     }
-
-    // function clearAreaAndPutHammer() {
-    //     // var areaToClear = [[hammer.x - 1, hammer.y - 1], [hammer.x, hammer.y], [hammer.x + 1, hammer.y + 1]];
-    //     //
-    //     // areaToClear.forEach(function (e) {
-    //     //     map[e[0]][e[1]] = floor;
-    //     // });
-    //
-    //     map[hammer.x][hammer.y] = hammer.symbol;
-    // }
 
     function clearMap() {
         /* TODO */
@@ -129,22 +120,23 @@ function baseMap() {
 
     function update() {
         // clearMap();
-        putMonster();
+        if (!monster.dead) {
+            putMonster();
+        }
         var pickedItem = pickItem();
         if (pickedItem != null) {
-            replaceItemToFloor(pickedItem)
+            replaceObjectToFloor(pickedItem)
         }
         if (metMonster()) {
-            //TODO: action to attack the monster
+            attackMonster();
             console.log('met monster');
         }
         putPlayer();
         showStatus();
-        // console.log('updated, player.x:' + player.x + ', p.y:' + player.y );
     }
 
     function showStatus() {
-        var basicStatus = 'updated, player.x:' + player.x + ', p.y:' + player.y;
+        var basicStatus = 'updated, player.x:' + player.x + ', p.y:' + player.y + ', p.life:' + player.life;
         var playerItems = player.items;
         for (var i = 0; i < playerItems.length; i++) {
             var playerItem = playerItems[i];
@@ -155,15 +147,15 @@ function baseMap() {
         console.log(basicStatus);
     }
 
-    function replacePlayerToFloor() {
-        map[player.x][player.y] = floor;
+    // function replacePlayerToFloor() {
+    //     map[player.x][player.y] = floor;
+    // }
+
+    function replaceObjectToFloor(object) {
+        map[object.x][object.y] = floor;
     }
 
-    function replaceItemToFloor(pickedItem) {
-        map[pickedItem.x][pickedItem.y] = floor;
-    }
-
-    /* a start of collision detection, for now it only checks for walls */
+    /* a start of collision detection */
     function checkNextTile(direction, x, y) {
         console.log(direction);
         var available = false;
@@ -222,7 +214,7 @@ function baseMap() {
         if (playerItems.includes(hammer)) {
             var indexOfHammer = playerItems.indexOf(hammer);
             var hammerLife = playerItems[indexOfHammer].life;
-            if(hammerLife > 0){
+            if (hammerLife > 0) {
                 map[positionX][positionY] = floor;
                 playerItems[indexOfHammer].life = playerItems[indexOfHammer].life - 1;
             }
@@ -249,6 +241,22 @@ function baseMap() {
         }
     }
 
+    function attackMonster() {
+        var hasSword = playerItems.includes(sword);
+        if (hasSword) {
+            var indexOfSword = playerItems.indexOf(sword);
+            var swordLife = playerItems[indexOfSword].life;
+        }
+        if (hasSword && swordLife > 0) {
+            replaceObjectToFloor(monster);
+            monster.dead = true;
+            playerItems[indexOfSword].life = playerItems[indexOfSword].life - 1;
+        }
+        else if (!hasSword || swordLife <= 0) {
+            player.life = player.life - 1;
+        }
+    }
+
     function printMap() {
         for (var i = 0; i < map.length; i++) {
             console.log(map[i].join(' '));
@@ -258,7 +266,7 @@ function baseMap() {
     return {
         player: player,
         update: update,
-        replacePlayerToFloor: replacePlayerToFloor,
+        replaceObjectToFloor: replaceObjectToFloor,
         checkNextTile: checkNextTile,
         printMap: printMap,
         openDoor: openDoor,
