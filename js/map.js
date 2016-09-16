@@ -34,7 +34,7 @@ function baseMap() {
                     oneRow[j] = wall;
                 } else {
 
-                    var chosenTile = chooseFloorOrWall();
+                    var chosenTile = chooseBetweenTwoThings(wall, floor);
 
                     /* left most tile and right most tile should be wall */
                     if (j == 0 || j == lastIndex) {
@@ -51,8 +51,8 @@ function baseMap() {
         return innerMap;
     }
 
-    function chooseFloorOrWall() {
-        return Math.random() < 0.5 ? floor : wall;
+    function chooseBetweenTwoThings(thing1, thing2) {
+        return Math.random() < 0.5 ? thing1 : thing2;
     }
 
     function putPlayer() {
@@ -69,19 +69,12 @@ function baseMap() {
 
     function setDoor() {
         door.x = getRandomInt(0, 15);
-        var doorPositionChoice = getRandomInt(0, 15);
+        var doorPositionChoice = getRandomInt(1, 15);
         if (door.x == 0 || door.x == 14) {
             door.y = doorPositionChoice;
+        } else {
+            door.y = chooseBetweenTwoThings(0, 14);
         }
-        else {
-            if (doorPositionChoice < 7) {
-                door.y = 0;
-            }
-            else {
-                door.y = 14;
-            }
-        }
-
         map[door.x][door.y] = door.symbol;
     }
 
