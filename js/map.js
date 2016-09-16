@@ -44,10 +44,8 @@ function baseMap() {
                     }
                 }
             }
-
             innerMap[i] = oneRow;
         }
-
         return innerMap;
     }
 
@@ -69,7 +67,7 @@ function baseMap() {
 
     function setDoor() {
         door.x = getRandomInt(0, 15);
-        var doorPositionChoice = getRandomInt(1, 15);
+        var doorPositionChoice = getRandomInt(1, 14);
         if (door.x == 0 || door.x == 14) {
             door.y = doorPositionChoice;
         } else {
