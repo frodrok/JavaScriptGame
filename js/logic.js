@@ -1,7 +1,6 @@
-// var baseMap = new Map();
 var baseMap = baseMap();
-
 var playing = false;
+
 function startGame() {
     playing = true;
     while (playing) {

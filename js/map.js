@@ -6,15 +6,16 @@ function baseMap() {
     var monster = new Monster(6, 6);
     var mapSize = 15;
 
-    var key = {symbol: String.fromCharCode(0xD83D, 0xDD11), x: 10, y: 13};
-    var hammer = {symbol: String.fromCharCode(0xD83D, 0xDD28), x: 5, y: 8};
+    var key = {name: 'key', symbol: String.fromCharCode(0xD83D, 0xDD11), x: 10, y: 13};
+    var hammer = {name: 'hammer', symbol: String.fromCharCode(0xD83D, 0xDD28), x: 5, y: 8};
     var door = {symbol: String.fromCharCode(0xD83D, 0xDEAA)};
+    var items = [key, hammer];
 
     var map = generateBaseMap();
-    map[key.x][key.y] = key.symbol;
 
-    setObjectsLocation();
-    clearPlayerRowAndColumn();
+    setItemsLocation();
+    map[key.x][key.y] = key.symbol;
+    clearAroundPlayerAndHammer();
     clearAreaAndPutHammer();
     setDoor();
 
@@ -98,7 +99,7 @@ function baseMap() {
         /* TODO */
     }
 
-    function clearPlayerRowAndColumn() {
+    function clearAroundPlayerAndHammer() {
 
         map.forEach(function (elementX, indexX) {
 
@@ -118,42 +119,76 @@ function baseMap() {
         return indexX === 0 || indexX === 14 || indexY === 0 || indexY === 14;
     }
 
-    function setObjectsLocation() {
+    function setItemsLocation() {
         var firstIndexOfInnerMap = 1;
         var lastIndexOfInnerMap = 13;
-        var objects = [];
-        objects.push(player, monster, key, hammer);
-        objects.forEach(function (element) {
-            element.x = getRandomInt(firstIndexOfInnerMap, lastIndexOfInnerMap);
-            element.y = getRandomInt(firstIndexOfInnerMap, lastIndexOfInnerMap);
+        items.forEach(function (item) {
+            item.x = getRandomInt(firstIndexOfInnerMap, lastIndexOfInnerMap);
+            item.y = getRandomInt(firstIndexOfInnerMap, lastIndexOfInnerMap);
         });
     }
 
     function update() {
+        var gotItem = false;
         // clearMap();
         putPlayer();
         putMonster();
-        console.log("updated, player.x:" + player.x + ", p.y:" + player.y);
+        gotItem = isOnItem();
+        showStatus();
+        // console.log('updated, player.x:' + player.x + ', p.y:' + player.y );
+        if (gotItem) {
+            replaceItemToFloor()
+        }
+    }
+
+    function showStatus() {
+        var basicStatus = 'updated, player.x:' + player.x + ', p.y:' + player.y + ', items:';
+        var playerItems = player.items;
+        for (i = 0; i < playerItems.length; i++) {
+            var playerItem = playerItems[i];
+            if(!basicStatus.includes(playerItem.name)){
+                basicStatus = basicStatus + playerItems[i].name + ' ';
+            }
+        }
+        console.log(basicStatus);
     }
 
     function replacePlayerToFloor() {
         map[player.x][player.y] = floor;
     }
 
+    function replaceItemToFloor(item) {
+        map[item.x][item.y] = floor;
+    }
+
     /* a start of collision detection, for now it only checks for walls */
     function isAvailable(direction, x, y) {
         console.log(direction);
         var available = false;
+        var directionUp = map[x - 1][y];
+        var directionLeft = map[x][y - 1];
+        var directionDown = map[x + 1][y];
+        var directionRight = map[x][y + 1];
+
         if (direction === 'w') {
-            available = (map[x - 1][y] !== wall);
+            available = (directionUp !== wall);
         } else if (direction === 'a') {
-            available = (map[x][y - 1] !== wall);
+            available = (directionLeft !== wall);
         } else if (direction === 's') {
-            available = (map[x + 1][y] !== wall);
+            available = (directionDown !== wall);
         } else if (direction === 'd') {
-            available = (map[x][y + 1] !== wall);
+            available = (directionRight !== wall);
         }
         return available;
+    }
+
+    function isOnItem() {
+        items.forEach(function (item) {
+            if (player.x === item.x && player.y === item.y) {
+                player.items.push(item);
+                return true;
+            }
+        });
     }
 
     function printMap() {
