@@ -14,9 +14,9 @@ function baseMap() {
     var map = generateBaseMap();
 
     setObjectsLocation();
-    map[key.x][key.y] = key.symbol;
     clearPlayerColumnAndHammerRow();
     clearAreaAndPutHammer();
+    map[key.x][key.y] = key.symbol;
     setDoor();
 
     function generateBaseMap() {
@@ -34,7 +34,7 @@ function baseMap() {
                     oneRow[j] = wall;
                 } else {
 
-                    var chosenTile = chooseBetweenTwoThings(wall, floor);
+                    var chosenTile = chooseBetween(wall, floor);
 
                     /* left most tile and right most tile should be wall */
                     if (j == 0 || j == lastIndex) {
@@ -49,7 +49,7 @@ function baseMap() {
         return innerMap;
     }
 
-    function chooseBetweenTwoThings(thing1, thing2) {
+    function chooseBetween(thing1, thing2) {
         return Math.random() < 0.5 ? thing1 : thing2;
     }
 
@@ -71,7 +71,7 @@ function baseMap() {
         if (door.x == 0 || door.x == 14) {
             door.y = doorPositionChoice;
         } else {
-            door.y = chooseBetweenTwoThings(0, 14);
+            door.y = chooseBetween(0, 14);
         }
         map[door.x][door.y] = door.symbol;
     }
@@ -136,7 +136,7 @@ function baseMap() {
     }
 
     function showStatus() {
-        var basicStatus = 'updated, player.x:' + player.x + ', p.y:' + player.y + ', items:';
+        var basicStatus = 'updated, player.x:' + player.x + ', p.y:' + player.y + ', item:';
         var playerItems = player.items;
         for (var i = 0; i < playerItems.length; i++) {
             var playerItem = playerItems[i];
@@ -156,24 +156,41 @@ function baseMap() {
     }
 
     /* a start of collision detection, for now it only checks for walls */
-    function isAvailable(direction, x, y) {
+    function checkNextTile(direction, x, y) {
         console.log(direction);
         var available = false;
+        var isDoor = false;
         var directionUp = map[x - 1][y];
         var directionLeft = map[x][y - 1];
         var directionDown = map[x + 1][y];
         var directionRight = map[x][y + 1];
 
         if (direction === 'w') {
-            available = (directionUp !== wall);
+            isDoor = (directionUp === door.symbol);
+            available = (directionUp !== wall && !isDoor);
         } else if (direction === 'a') {
-            available = (directionLeft !== wall);
+            isDoor = (directionLeft === door.symbol);
+            available = (directionLeft !== wall && !isDoor);
         } else if (direction === 's') {
-            available = (directionDown !== wall);
+            isDoor = (directionDown === door.symbol);
+            available = (directionDown !== wall && !isDoor);
         } else if (direction === 'd') {
-            available = (directionRight !== wall);
+            isDoor = (directionRight === door.symbol);
+            available = (directionRight !== wall && !isDoor);
         }
-        return available;
+        return {
+            available: available,
+            isDoor: isDoor
+        };
+    }
+
+    function openDoor() {
+        var playerItems = player.items;
+        if (playerItems.includes(key)) {
+            map[door.x][door.y] = floor;
+            var indexOfKey = playerItems.indexOf(key);
+            playerItems.splice(indexOfKey, 1);
+        }
     }
 
     function isOnItem() {
@@ -204,7 +221,8 @@ function baseMap() {
         player: player,
         update: update,
         replacePlayerToFloor: replacePlayerToFloor,
-        isAvailable: isAvailable,
-        printMap: printMap
+        checkNextTile: checkNextTile,
+        printMap: printMap,
+        openDoor: openDoor
     }
 }

@@ -15,7 +15,9 @@ function startGame() {
         if (input != null) {
             input.toLowerCase();
         }
-
+        if(isDoor(input)){
+            baseMap.openDoor();
+        }
         handleInput(input);
     }
 }
@@ -25,25 +27,25 @@ function handleInput(input) {
     switch (input) {
 
         case 'w':
-            if (floorIsAvailable(input)) {
+            if (isWalkable(input)) {
                 baseMap.player.moveUp();
             }
             break;
 
         case 's':
-            if (floorIsAvailable(input)) {
+            if (isWalkable(input)) {
                 baseMap.player.moveDown();
             }
             break;
 
         case 'a':
-            if (floorIsAvailable(input)) {
+            if (isWalkable(input)) {
                 baseMap.player.moveLeft();
             }
             break;
 
         case 'd':
-            if (floorIsAvailable(input)) {
+            if (isWalkable(input)) {
                 baseMap.player.moveRight();
             }
             break;
@@ -58,24 +60,45 @@ function handleInput(input) {
     }
 }
 
-function floorIsAvailable(direction) {
+function isWalkable(direction) {
 
     switch (direction) {
 
         case 'w':
-            return baseMap.isAvailable('w', baseMap.player.x, baseMap.player.y);
+            return baseMap.checkNextTile('w', baseMap.player.x, baseMap.player.y).available;
             break;
 
         case 'a':
-            return baseMap.isAvailable('a', baseMap.player.x, baseMap.player.y);
+            return baseMap.checkNextTile('a', baseMap.player.x, baseMap.player.y).available;
             break;
 
         case 's':
-            return baseMap.isAvailable('s', baseMap.player.x, baseMap.player.y);
+            return baseMap.checkNextTile('s', baseMap.player.x, baseMap.player.y).available;
             break;
 
         case 'd':
-            return baseMap.isAvailable('d', baseMap.player.x, baseMap.player.y);
+            return baseMap.checkNextTile('d', baseMap.player.x, baseMap.player.y).available;
+            break;
+    }
+}
+
+function isDoor(direction){
+
+    switch(direction){
+        case 'w':
+            return baseMap.checkNextTile('w', baseMap.player.x, baseMap.player.y).isDoor;
+            break;
+
+        case 'a':
+            return baseMap.checkNextTile('a', baseMap.player.x, baseMap.player.y).isDoor;
+            break;
+
+        case 's':
+            return baseMap.checkNextTile('s', baseMap.player.x, baseMap.player.y).isDoor;
+            break;
+
+        case 'd':
+            return baseMap.checkNextTile('d', baseMap.player.x, baseMap.player.y).isDoor;
             break;
     }
 }
