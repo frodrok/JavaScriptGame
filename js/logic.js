@@ -18,6 +18,10 @@ function startGame() {
         if(isDoor(input)){
             baseMap.openDoor();
         }
+        var wallPosition = getWallPosition(input);
+        if(wallPosition != null){
+            baseMap.smashWall(wallPosition.x, wallPosition.y);
+        }
         handleInput(input);
     }
 }
@@ -100,6 +104,56 @@ function isDoor(direction){
         case 'd':
             return baseMap.checkNextTile('d', baseMap.player.x, baseMap.player.y).isDoor;
             break;
+    }
+}
+
+function getWallPosition(direction){
+
+    var nextTile;
+    switch(direction){
+
+        case 'w':
+            nextTile = baseMap.checkNextTile('w', baseMap.player.x, baseMap.player.y);
+            if(nextTile.isWall){
+                return {
+                    x: nextTile.positionX,
+                    y: nextTile.positionY
+                }
+            }
+            break;
+
+        case 'a':
+            nextTile = baseMap.checkNextTile('a', baseMap.player.x, baseMap.player.y);
+            if(nextTile.isWall) {
+                return {
+                    x: nextTile.positionX,
+                    y: nextTile.positionY
+                }
+            }
+            break;
+
+        case 's':
+            nextTile = baseMap.checkNextTile('s', baseMap.player.x, baseMap.player.y);
+            if(nextTile.isWall){
+                return {
+                    x: nextTile.positionX,
+                    y: nextTile.positionY
+                }
+            }
+            break;
+
+        case 'd':
+            nextTile = baseMap.checkNextTile('d', baseMap.player.x, baseMap.player.y);
+            if(nextTile.isWall){
+                return {
+                    x: nextTile.positionX,
+                    y: nextTile.positionY
+                }
+            }
+            break;
+
+        default:
+            return null;
     }
 }
 

@@ -6,12 +6,13 @@ function baseMap() {
     var monster = new Monster(6, 6);
     var mapSize = 15;
 
-    var key = {name: 'key', symbol: String.fromCharCode(0xD83D, 0xDD11), x: 10, y: 13};
-    var hammer = {name: 'hammer', symbol: String.fromCharCode(0xD83D, 0xDD28), x: 5, y: 8};
+    var key = {name: 'key', life: 1, symbol: String.fromCharCode(0xD83D, 0xDD11), x: 10, y: 13};
+    var hammer = {name: 'hammer', life: 3, symbol: String.fromCharCode(0xD83D, 0xDD28), x: 5, y: 8};
     var door = {symbol: String.fromCharCode(0xD83D, 0xDEAA)};
     var items = [key, hammer];
     var objects = [player, key, hammer, monster];
     var map = generateBaseMap();
+    var playerItems = player.items;
 
     setObjectsLocation();
     clearPlayerColumnAndHammerRow();
@@ -124,7 +125,7 @@ function baseMap() {
 
         putPlayer();
         putMonster();
-        if (isOnItem()) {
+        if (gotItem()) {
             replaceItemToFloor()
         }
         if (metMonster()) {
@@ -136,12 +137,15 @@ function baseMap() {
     }
 
     function showStatus() {
-        var basicStatus = 'updated, player.x:' + player.x + ', p.y:' + player.y + ', item:';
+        var basicStatus = 'updated, player.x:' + player.x + ', p.y:' + player.y;
         var playerItems = player.items;
         for (var i = 0; i < playerItems.length; i++) {
             var playerItem = playerItems[i];
-            if (!basicStatus.includes(playerItem.name)) {
-                basicStatus = basicStatus + playerItems[i].name + ' ';
+            if (!basicStatus.includes(playerItem.name) && playerItem === key) {
+                basicStatus = basicStatus + ', key:' + key.life;
+            }
+            if (!basicStatus.includes(playerItem.name) && playerItem === hammer) {
+                basicStatus = basicStatus + ', hammer:' + hammer.life;
             }
         }
         console.log(basicStatus);
@@ -160,32 +164,49 @@ function baseMap() {
         console.log(direction);
         var available = false;
         var isDoor = false;
+        var isWall = false;
         var directionUp = map[x - 1][y];
         var directionLeft = map[x][y - 1];
         var directionDown = map[x + 1][y];
         var directionRight = map[x][y + 1];
+        var positionX;
+        var positionY;
 
         if (direction === 'w') {
             isDoor = (directionUp === door.symbol);
-            available = (directionUp !== wall && !isDoor);
+            isWall = (directionUp === wall);
+            available = (!isWall && !isDoor);
+            positionX = x - 1;
+            positionY = y;
         } else if (direction === 'a') {
             isDoor = (directionLeft === door.symbol);
-            available = (directionLeft !== wall && !isDoor);
+            isWall = (directionLeft === wall);
+            available = (!isWall && !isDoor);
+            positionX = x;
+            positionY = y - 1;
         } else if (direction === 's') {
             isDoor = (directionDown === door.symbol);
-            available = (directionDown !== wall && !isDoor);
+            isWall = (directionDown === wall);
+            available = (!isWall && !isDoor);
+            positionX = x + 1;
+            positionY = y;
         } else if (direction === 'd') {
             isDoor = (directionRight === door.symbol);
-            available = (directionRight !== wall && !isDoor);
+            isWall = (directionRight === wall);
+            available = (!isWall && !isDoor);
+            positionX = x;
+            positionY = y + 1;
         }
         return {
+            isDoor: isDoor,
+            isWall: isWall,
             available: available,
-            isDoor: isDoor
+            positionX: positionX,
+            positionY: positionY
         };
     }
 
     function openDoor() {
-        var playerItems = player.items;
         if (playerItems.includes(key)) {
             map[door.x][door.y] = floor;
             var indexOfKey = playerItems.indexOf(key);
@@ -193,7 +214,18 @@ function baseMap() {
         }
     }
 
-    function isOnItem() {
+    function smashWall(positionX, positionY) {
+        if (playerItems.includes(hammer)) {
+            var indexOfHammer = playerItems.indexOf(hammer);
+            var hammerLife = playerItems[indexOfHammer].life;
+            if(hammerLife > 0){
+                map[positionX][positionY] = floor;
+                playerItems[indexOfHammer].life = playerItems[indexOfHammer].life - 1;
+            }
+        }
+    }
+
+    function gotItem() {
         items.forEach(function (item) {
             if (player.x === item.x && player.y === item.y) {
                 player.items.push(item);
@@ -223,6 +255,7 @@ function baseMap() {
         replacePlayerToFloor: replacePlayerToFloor,
         checkNextTile: checkNextTile,
         printMap: printMap,
-        openDoor: openDoor
+        openDoor: openDoor,
+        smashWall: smashWall
     }
 }
