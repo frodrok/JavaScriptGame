@@ -10,12 +10,12 @@ function baseMap() {
     var hammer = {name: 'hammer', symbol: String.fromCharCode(0xD83D, 0xDD28), x: 5, y: 8};
     var door = {symbol: String.fromCharCode(0xD83D, 0xDEAA)};
     var items = [key, hammer];
-
+    var objects = [player, key, hammer, monster];
     var map = generateBaseMap();
 
-    setItemsLocation();
+    setObjectsLocation();
     map[key.x][key.y] = key.symbol;
-    clearAroundPlayerAndHammer();
+    clearPlayerColumnAndHammerRow();
     clearAreaAndPutHammer();
     setDoor();
 
@@ -99,7 +99,7 @@ function baseMap() {
         /* TODO */
     }
 
-    function clearAroundPlayerAndHammer() {
+    function clearPlayerColumnAndHammerRow() {
 
         map.forEach(function (elementX, indexX) {
 
@@ -119,34 +119,37 @@ function baseMap() {
         return indexX === 0 || indexX === 14 || indexY === 0 || indexY === 14;
     }
 
-    function setItemsLocation() {
+    function setObjectsLocation() {
         var firstIndexOfInnerMap = 1;
         var lastIndexOfInnerMap = 13;
-        items.forEach(function (item) {
-            item.x = getRandomInt(firstIndexOfInnerMap, lastIndexOfInnerMap);
-            item.y = getRandomInt(firstIndexOfInnerMap, lastIndexOfInnerMap);
+        objects.forEach(function (object) {
+            object.x = getRandomInt(firstIndexOfInnerMap, lastIndexOfInnerMap);
+            object.y = getRandomInt(firstIndexOfInnerMap, lastIndexOfInnerMap);
         });
     }
 
     function update() {
-        var gotItem = false;
         // clearMap();
+
         putPlayer();
         putMonster();
-        gotItem = isOnItem();
-        showStatus();
-        // console.log('updated, player.x:' + player.x + ', p.y:' + player.y );
-        if (gotItem) {
+        if (isOnItem()) {
             replaceItemToFloor()
         }
+        if (metMonster()) {
+            //TODO: action to attack the monster
+            console.log('met monster');
+        }
+        showStatus();
+        // console.log('updated, player.x:' + player.x + ', p.y:' + player.y );
     }
 
     function showStatus() {
         var basicStatus = 'updated, player.x:' + player.x + ', p.y:' + player.y + ', items:';
         var playerItems = player.items;
-        for (i = 0; i < playerItems.length; i++) {
+        for (var i = 0; i < playerItems.length; i++) {
             var playerItem = playerItems[i];
-            if(!basicStatus.includes(playerItem.name)){
+            if (!basicStatus.includes(playerItem.name)) {
                 basicStatus = basicStatus + playerItems[i].name + ' ';
             }
         }
@@ -189,6 +192,15 @@ function baseMap() {
                 return true;
             }
         });
+    }
+
+    function metMonster() {
+        var isNearMonster = ((monster.x >= player.x - 1 && monster.x <= player.x + 1 ) && monster.y === player.y) ||
+            ((monster.y >= player.y - 1 && monster.y <= player.y + 1) && monster.x === player.x);
+
+        if (isNearMonster) {
+            return true;
+        }
     }
 
     function printMap() {
