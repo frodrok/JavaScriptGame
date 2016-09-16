@@ -18,9 +18,11 @@ function startGame() {
         if(isDoor(input)){
             baseMap.openDoor();
         }
-        var wallPosition = getWallPosition(input);
-        if(wallPosition != null){
-            baseMap.smashWall(wallPosition.x, wallPosition.y);
+        var position = getPosition(input);
+        if(position != null && position.isWall){
+            baseMap.smashWall(position.x, position.y);
+        }else if(position != null && position.isMonster){
+            baseMap.attackMonster(position.x, position.y);
         }
         handleInput(input);
     }
@@ -107,7 +109,7 @@ function isDoor(direction){
     }
 }
 
-function getWallPosition(direction){
+function getPosition(direction){
 
     var nextTile;
     switch(direction){
@@ -116,6 +118,13 @@ function getWallPosition(direction){
             nextTile = baseMap.checkNextTile('w', baseMap.player.x, baseMap.player.y);
             if(nextTile.isWall){
                 return {
+                    isWall: nextTile.isWall,
+                    x: nextTile.positionX,
+                    y: nextTile.positionY
+                }
+            } else if (nextTile.isMonster) {
+                return {
+                    isMonster: nextTile.isMonster,
                     x: nextTile.positionX,
                     y: nextTile.positionY
                 }
@@ -126,6 +135,13 @@ function getWallPosition(direction){
             nextTile = baseMap.checkNextTile('a', baseMap.player.x, baseMap.player.y);
             if(nextTile.isWall) {
                 return {
+                    isWall: nextTile.isWall,
+                    x: nextTile.positionX,
+                    y: nextTile.positionY
+                }
+            } else if (nextTile.isMonster) {
+                return {
+                    isMonster: nextTile.isMonster,
                     x: nextTile.positionX,
                     y: nextTile.positionY
                 }
@@ -136,6 +152,13 @@ function getWallPosition(direction){
             nextTile = baseMap.checkNextTile('s', baseMap.player.x, baseMap.player.y);
             if(nextTile.isWall){
                 return {
+                    isWall: nextTile.isWall,
+                    x: nextTile.positionX,
+                    y: nextTile.positionY
+                }
+            } else if (nextTile.isMonster) {
+                return {
+                    isMonster: nextTile.isMonster,
                     x: nextTile.positionX,
                     y: nextTile.positionY
                 }
@@ -146,6 +169,13 @@ function getWallPosition(direction){
             nextTile = baseMap.checkNextTile('d', baseMap.player.x, baseMap.player.y);
             if(nextTile.isWall){
                 return {
+                    isWall: nextTile.isWall,
+                    x: nextTile.positionX,
+                    y: nextTile.positionY
+                }
+            } else if (nextTile.isMonster) {
+                return {
+                    isMonster: nextTile.isMonster,
                     x: nextTile.positionX,
                     y: nextTile.positionY
                 }

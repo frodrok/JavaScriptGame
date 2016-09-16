@@ -121,17 +121,22 @@ function baseMap() {
     function update() {
         // clearMap();
         if (!monster.dead) {
+            player.symbol = String.fromCharCode(0xD83D, 0xDE04);
             putMonster();
         }
         var pickedItem = pickItem();
         if (pickedItem != null) {
             replaceObjectToFloor(pickedItem)
         }
-        if (metMonster()) {
+        if (isNearMonster()) {
             player.symbol = String.fromCharCode(0xD83D, 0xDE2B);
-            attackMonster();
+        } else if (metMonster()){
+            player.life = player.life - 1;
         } else {
             player.symbol = String.fromCharCode(0xD83D, 0xDE04);
+        }
+        if (player.life <= 0) {
+            player.symbol = String.fromCharCode(0xD83D, 0xDE31);
         }
         putPlayer();
         showStatus();
@@ -159,6 +164,7 @@ function baseMap() {
         var available = false;
         var isDoor = false;
         var isWall = false;
+        var isMonster = false;
         var directionUp = map[x - 1][y];
         var directionLeft = map[x][y - 1];
         var directionDown = map[x + 1][y];
@@ -169,24 +175,28 @@ function baseMap() {
         if (direction === 'w') {
             isDoor = (directionUp === door.symbol);
             isWall = (directionUp === wall);
+            isMonster = (directionUp === monster.symbol);
             available = (!isWall && !isDoor);
             positionX = x - 1;
             positionY = y;
         } else if (direction === 'a') {
             isDoor = (directionLeft === door.symbol);
             isWall = (directionLeft === wall);
+            isMonster = (directionLeft === monster.symbol);
             available = (!isWall && !isDoor);
             positionX = x;
             positionY = y - 1;
         } else if (direction === 's') {
             isDoor = (directionDown === door.symbol);
             isWall = (directionDown === wall);
+            isMonster = (directionDown === monster.symbol);
             available = (!isWall && !isDoor);
             positionX = x + 1;
             positionY = y;
         } else if (direction === 'd') {
             isDoor = (directionRight === door.symbol);
             isWall = (directionRight === wall);
+            isMonster = (directionRight === monster.symbol);
             available = (!isWall && !isDoor);
             positionX = x;
             positionY = y + 1;
@@ -194,6 +204,7 @@ function baseMap() {
         return {
             isDoor: isDoor,
             isWall: isWall,
+            isMonster: isMonster,
             available: available,
             positionX: positionX,
             positionY: positionY
@@ -230,7 +241,7 @@ function baseMap() {
         return pickedItem;
     }
 
-    function metMonster() {
+    function isNearMonster() {
         var isNearMonster = ((monster.x >= player.x - 1 && monster.x <= player.x + 1 ) && monster.y === player.y) ||
             ((monster.y >= player.y - 1 && monster.y <= player.y + 1) && monster.x === player.x);
 
@@ -239,16 +250,23 @@ function baseMap() {
         }
     }
 
-    function attackMonster() {
+    function metMonster(){
+        if(monster.x === player.x && monster.y === player.y) {
+            return true;
+        }
+    }
+
+    function attackMonster(positionX, positionY) {
         var hasSword = playerItems.includes(sword);
         if (hasSword) {
             var indexOfSword = playerItems.indexOf(sword);
             var swordLife = playerItems[indexOfSword].life;
         }
         if (hasSword && swordLife > 0) {
-            replaceObjectToFloor(monster);
+            map[positionX][positionY] = floor;
             monster.dead = true;
             playerItems[indexOfSword].life = playerItems[indexOfSword].life - 1;
+            player.symbol = String.fromCharCode(0xD83D, 0xDE04);
         }
         else if (!hasSword || swordLife <= 0) {
             player.life = player.life - 1;
@@ -271,6 +289,7 @@ function baseMap() {
         checkNextTile: checkNextTile,
         printMap: printMap,
         openDoor: openDoor,
-        smashWall: smashWall
+        smashWall: smashWall,
+        attackMonster: attackMonster
     }
 }
