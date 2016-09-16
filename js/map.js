@@ -8,16 +8,18 @@ function baseMap() {
 
     var key = {name: 'key', life: 1, symbol: String.fromCharCode(0xD83D, 0xDD11), x: 10, y: 13};
     var hammer = {name: 'hammer', life: 3, symbol: String.fromCharCode(0xD83D, 0xDD28), x: 5, y: 8};
+    var sword = {name: 'sword', life: 1, symbol: String.fromCharCode(0xD83D, 0xDDE1), x: 4, y: 13};
     var door = {symbol: String.fromCharCode(0xD83D, 0xDEAA)};
-    var items = [key, hammer];
-    var objects = [player, key, hammer, monster];
+    var items = [key, hammer, sword];
+    var objects = [player, key, hammer, monster, sword];
     var map = generateBaseMap();
     var playerItems = player.items;
 
     setObjectsLocation();
     clearPlayerColumnAndHammerRow();
-    clearAreaAndPutHammer();
-    map[key.x][key.y] = key.symbol;
+    // clearAreaAndPutHammer();
+    putItems();
+    // map[key.x][key.y] = key.symbol;
     setDoor();
 
     function generateBaseMap() {
@@ -54,6 +56,11 @@ function baseMap() {
         return Math.random() < 0.5 ? thing1 : thing2;
     }
 
+    function putItems(){
+        items.forEach(function(item){
+            map[item.x][item.y] = item.symbol;
+        })
+    }
     function putPlayer() {
         map[player.x][player.y] = player.symbol;
     }
@@ -77,15 +84,15 @@ function baseMap() {
         map[door.x][door.y] = door.symbol;
     }
 
-    function clearAreaAndPutHammer() {
-        // var areaToClear = [[hammer.x - 1, hammer.y - 1], [hammer.x, hammer.y], [hammer.x + 1, hammer.y + 1]];
-        //
-        // areaToClear.forEach(function (e) {
-        //     map[e[0]][e[1]] = floor;
-        // });
-
-        map[hammer.x][hammer.y] = hammer.symbol;
-    }
+    // function clearAreaAndPutHammer() {
+    //     // var areaToClear = [[hammer.x - 1, hammer.y - 1], [hammer.x, hammer.y], [hammer.x + 1, hammer.y + 1]];
+    //     //
+    //     // areaToClear.forEach(function (e) {
+    //     //     map[e[0]][e[1]] = floor;
+    //     // });
+    //
+    //     map[hammer.x][hammer.y] = hammer.symbol;
+    // }
 
     function clearMap() {
         /* TODO */
@@ -122,16 +129,16 @@ function baseMap() {
 
     function update() {
         // clearMap();
-
-        putPlayer();
         putMonster();
-        if (gotItem()) {
-            replaceItemToFloor()
+        var pickedItem = pickItem();
+        if (pickedItem != null) {
+            replaceItemToFloor(pickedItem)
         }
         if (metMonster()) {
             //TODO: action to attack the monster
             console.log('met monster');
         }
+        putPlayer();
         showStatus();
         // console.log('updated, player.x:' + player.x + ', p.y:' + player.y );
     }
@@ -141,11 +148,8 @@ function baseMap() {
         var playerItems = player.items;
         for (var i = 0; i < playerItems.length; i++) {
             var playerItem = playerItems[i];
-            if (!basicStatus.includes(playerItem.name) && playerItem === key) {
-                basicStatus = basicStatus + ', key:' + key.life;
-            }
-            if (!basicStatus.includes(playerItem.name) && playerItem === hammer) {
-                basicStatus = basicStatus + ', hammer:' + hammer.life;
+            if (!basicStatus.includes(playerItem.name)) {
+                basicStatus = basicStatus + ', ' + playerItem.name + ':' + playerItem.life;
             }
         }
         console.log(basicStatus);
@@ -155,8 +159,8 @@ function baseMap() {
         map[player.x][player.y] = floor;
     }
 
-    function replaceItemToFloor(item) {
-        map[item.x][item.y] = floor;
+    function replaceItemToFloor(pickedItem) {
+        map[pickedItem.x][pickedItem.y] = floor;
     }
 
     /* a start of collision detection, for now it only checks for walls */
@@ -225,13 +229,15 @@ function baseMap() {
         }
     }
 
-    function gotItem() {
+    function pickItem() {
+        var pickedItem = null;
         items.forEach(function (item) {
             if (player.x === item.x && player.y === item.y) {
                 player.items.push(item);
-                return true;
+                pickedItem = item;
             }
         });
+        return pickedItem;
     }
 
     function metMonster() {
