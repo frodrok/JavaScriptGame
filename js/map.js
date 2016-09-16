@@ -128,8 +128,10 @@ function baseMap() {
             replaceObjectToFloor(pickedItem)
         }
         if (metMonster()) {
+            player.symbol = String.fromCharCode(0xD83D, 0xDE2B);
             attackMonster();
-            console.log('met monster');
+        } else {
+            player.symbol = String.fromCharCode(0xD83D, 0xDE04);
         }
         putPlayer();
         showStatus();
@@ -146,10 +148,6 @@ function baseMap() {
         }
         console.log(basicStatus);
     }
-
-    // function replacePlayerToFloor() {
-    //     map[player.x][player.y] = floor;
-    // }
 
     function replaceObjectToFloor(object) {
         map[object.x][object.y] = floor;
@@ -254,6 +252,9 @@ function baseMap() {
         }
         else if (!hasSword || swordLife <= 0) {
             player.life = player.life - 1;
+            if (player.life <= 0) {
+                player.symbol = String.fromCharCode(0xD83D, 0xDE31);
+            }
         }
     }
 
