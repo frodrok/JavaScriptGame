@@ -14,8 +14,15 @@ function map() {
     var objects = [player, key, hammer, monster, sword];
     var map = generateBaseMap();
     var playersItems = player.items;
+    var level = 1;
+
     player.life = 3;
     monster.dead = false;
+    playersItems.push(
+        {name: 'key', life: 0, symbol: key.symbol},
+        {name: 'hammer', life: 0, symbol: hammer.symbol},
+        {name: 'sword', life: 0, symbol: sword.symbol}
+        );
 
     setPositionToObjects();
     clearPlayerColumnAndHammerRow();
@@ -130,10 +137,11 @@ function map() {
         if (metMonster()) {
             player.life = player.life - 1;
         }
-        if (isNearMonster()) {
-            player.symbol = String.fromCharCode(0xD83D, 0xDE2B);
-        } else if (playerIsDead()) {
+        if (playerIsDead()) {
             player.symbol = String.fromCharCode(0xD83D, 0xDE31);
+        }
+        else if (isNearMonster()) {
+            player.symbol = String.fromCharCode(0xD83D, 0xDE2B);
         } else {
             player.symbol = String.fromCharCode(0xD83D, 0xDE04);
         }
@@ -142,17 +150,16 @@ function map() {
     }
 
     function showStatus() {
-        var basicStatus = 'updated, player.x:' + player.x + ', p.y:' + player.y + ', p.life:' + player.life;
+        var status = 'level:' + level + ', player.x:' + player.x + ', p.y:' + player.y + ', ' +
+            String.fromCharCode(0x2665) + ' ' + player.life;
         for (var i = 0; i < playersItems.length; i++) {
             var playerItem = playersItems[i];
-            if (!basicStatus.includes(playerItem.name)) {
-                basicStatus = basicStatus + ', ' + playerItem.name + ':' + playerItem.life;
-            }
+            status = status + ', ' + playerItem.symbol + ' ' + playerItem.life;
         }
-        console.log(basicStatus);
+        console.log(status);
     }
 
-    function replacePlayerToFloor(){
+    function replacePlayerToFloor() {
         map[player.x][player.y] = floor;
     }
 
@@ -268,7 +275,7 @@ function map() {
                 if (itemSearch.hasItem) {
                     var playersItem = itemSearch.foundItem;
                     playersItem.life = playersItem.life + item.life;
-                }else {
+                } else {
                     var newItem = {name: item.name, life: item.life};
                     playersItems.push(newItem);
                 }
@@ -320,7 +327,7 @@ function map() {
         }
     }
 
-    function goToNewRoom() {
+    function goToNextRoom() {
         monster.dead = false;
         // setPositionToPlayer();
         map = generateBaseMap();
@@ -329,6 +336,7 @@ function map() {
         clearPlayerColumnAndHammerRow();
         putItems();
         setDoor();
+        level++;
     }
 
     return {
@@ -341,6 +349,6 @@ function map() {
         smashWall: smashWall,
         attackMonster: attackMonster,
         playerIsDead: playerIsDead,
-        goToNewRoom: goToNewRoom
+        goToNewRoom: goToNextRoom
     }
 }

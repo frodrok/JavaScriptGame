@@ -9,9 +9,8 @@ function startGame() {
         baseMap.update();
         baseMap.printMap();
         baseMap.replacePlayerToFloor();
-        if (baseMap.playerIsDead()) {
-            gameOver();
-        } else {
+
+        if(!baseMap.playerIsDead()){
             var input = prompt('Which direction would you like to go? [w]: up, [s]: down, [a]: left or [d]: right. ' +
                 'Enter [q] to stop getting prompts.');
             if (input !== null) {
@@ -26,8 +25,9 @@ function startGame() {
             } else if (position != null && position.isMonster) {
                 baseMap.attackMonster(position.x, position.y);
             }
-
             handleInput(input);
+        } else {
+            gameOver();
         }
     }
 }
