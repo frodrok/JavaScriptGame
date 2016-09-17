@@ -1,4 +1,4 @@
-function baseMap() {
+function map() {
 
     var floor = String.fromCharCode(0x2B1C);
     var wall = String.fromCharCode(0x2B1B);
@@ -120,6 +120,7 @@ function baseMap() {
 
     function update() {
         // clearMap();
+        showStatus();
         if (!monster.dead) {
             putMonster();
         }
@@ -133,11 +134,26 @@ function baseMap() {
         if (metMonster()) {
             player.life = player.life - 1;
         }
-        if (player.life <= 0) {
+        if (playerIsDead()) {
             player.symbol = String.fromCharCode(0xD83D, 0xDE31);
+        //     console.clear();
+        //     console.log(String.fromCharCode(0xD83C, 0xDFAE) + String.fromCharCode(0x274C) + ' GAME OVER ' +
+        //         String.fromCharCode(0xD83C, 0xDFAE) + String.fromCharCode(0x274C));
+            // var input = prompt('Game over! Play again? y/n');
+            // if(input != null){
+            //     input.toLowerCase();
+            // }
+            // switch (input){
+            //
+            //     case 'y':
+            //         startGame();
+            //         break;
+            //
+            //     case 'n':
+            //         break;
+            // }
         }
         putPlayer();
-        showStatus();
     }
 
     function showStatus() {
@@ -270,6 +286,12 @@ function baseMap() {
         }
     }
 
+    function playerIsDead(){
+        if(player.life <= 0){
+            return true;
+        }
+    }
+
     function printMap() {
         for (var i = 0; i < map.length; i++) {
             console.log(map[i].join(' '));
@@ -284,6 +306,7 @@ function baseMap() {
         printMap: printMap,
         openDoor: openDoor,
         smashWall: smashWall,
-        attackMonster: attackMonster
+        attackMonster: attackMonster,
+        playerIsDead: playerIsDead
     }
 }

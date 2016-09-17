@@ -1,4 +1,4 @@
-var baseMap = baseMap();
+var baseMap = map();
 var playing = false;
 
 function startGame() {
@@ -9,22 +9,27 @@ function startGame() {
         baseMap.update();
         baseMap.printMap();
         baseMap.replaceObjectToFloor(baseMap.player);
+        if (baseMap.playerIsDead()) {
+            gameOver();
+        } else {
+            var input = prompt('Which direction would you like to go? [w]: up, [s]: down, [a]: left or [d]: right. ' +
+                'Enter [q] to stop getting prompts.');
 
-        var input = prompt('Which direction would you like to go? [w]: up, [s]: down, [a]: left or [d]: right. Enter [q] to stop getting prompts.');
+            if (input !== null) {
+                input.toLowerCase();
+            }
+            if (isDoor(input)) {
+                baseMap.openDoor();
+            }
+            var position = getPosition(input);
+            if (position != null && position.isWall) {
+                baseMap.smashWall(position.x, position.y);
+            } else if (position != null && position.isMonster) {
+                baseMap.attackMonster(position.x, position.y);
+            }
 
-        if (input != null) {
-            input.toLowerCase();
+            handleInput(input);
         }
-        if(isDoor(input)){
-            baseMap.openDoor();
-        }
-        var position = getPosition(input);
-        if(position != null && position.isWall){
-            baseMap.smashWall(position.x, position.y);
-        }else if(position != null && position.isMonster){
-            baseMap.attackMonster(position.x, position.y);
-        }
-        handleInput(input);
     }
 }
 
@@ -88,9 +93,9 @@ function isWalkable(direction) {
     }
 }
 
-function isDoor(direction){
+function isDoor(direction) {
 
-    switch(direction){
+    switch (direction) {
         case 'w':
             return baseMap.checkNextTile('w', baseMap.player.x, baseMap.player.y).isDoor;
             break;
@@ -109,14 +114,14 @@ function isDoor(direction){
     }
 }
 
-function getPosition(direction){
+function getPosition(direction) {
 
     var nextTile;
-    switch(direction){
+    switch (direction) {
 
         case 'w':
             nextTile = baseMap.checkNextTile('w', baseMap.player.x, baseMap.player.y);
-            if(nextTile.isWall){
+            if (nextTile.isWall) {
                 return {
                     isWall: nextTile.isWall,
                     x: nextTile.positionX,
@@ -133,7 +138,7 @@ function getPosition(direction){
 
         case 'a':
             nextTile = baseMap.checkNextTile('a', baseMap.player.x, baseMap.player.y);
-            if(nextTile.isWall) {
+            if (nextTile.isWall) {
                 return {
                     isWall: nextTile.isWall,
                     x: nextTile.positionX,
@@ -150,7 +155,7 @@ function getPosition(direction){
 
         case 's':
             nextTile = baseMap.checkNextTile('s', baseMap.player.x, baseMap.player.y);
-            if(nextTile.isWall){
+            if (nextTile.isWall) {
                 return {
                     isWall: nextTile.isWall,
                     x: nextTile.positionX,
@@ -167,7 +172,7 @@ function getPosition(direction){
 
         case 'd':
             nextTile = baseMap.checkNextTile('d', baseMap.player.x, baseMap.player.y);
-            if(nextTile.isWall){
+            if (nextTile.isWall) {
                 return {
                     isWall: nextTile.isWall,
                     x: nextTile.positionX,
@@ -184,6 +189,20 @@ function getPosition(direction){
 
         default:
             return null;
+    }
+}
+
+function gameOver() {
+    var gameOverSign = String.fromCharCode(0xD83C, 0xDFAE) + String.fromCharCode(0x274C);
+    console.log(gameOverSign + ' GAME OVER ' + gameOverSign);
+    playing = false;
+    var replayAnswer = prompt('Game over! Play again? y/n');
+    if(replayAnswer != null){
+        replayAnswer.toLowerCase();
+    }
+    if(replayAnswer === 'y'){
+        baseMap = map();
+        startGame();
     }
 }
 
