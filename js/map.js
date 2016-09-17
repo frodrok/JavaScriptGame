@@ -123,7 +123,7 @@ function map() {
         if (!monster.dead) {
             putMonster();
         }
-        var pickedItem = pickItem().pickedItem;
+        var pickedItem = pickUpItem().pickedItem;
         if (pickedItem != null) {
             replaceObjectToFloor(pickedItem)
         }
@@ -152,8 +152,14 @@ function map() {
         console.log(basicStatus);
     }
 
+    function replacePlayerToFloor(){
+        map[player.x][player.y] = floor;
+    }
+
     function replaceObjectToFloor(object) {
         map[object.x][object.y] = floor;
+        object.x = -1;
+        object.y = -1;
     }
 
     /* a start of collision detection */
@@ -254,7 +260,7 @@ function map() {
         }
     }
 
-    function pickItem() {
+    function pickUpItem() {
         var pickedItem = null;
         items.forEach(function (item) {
             if (player.x === item.x && player.y === item.y) {
@@ -328,7 +334,7 @@ function map() {
     return {
         player: player,
         update: update,
-        replaceObjectToFloor: replaceObjectToFloor,
+        replacePlayerToFloor: replacePlayerToFloor,
         checkNextTile: checkNextTile,
         printMap: printMap,
         openDoor: openDoor,

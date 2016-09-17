@@ -8,7 +8,7 @@ function startGame() {
         console.clear();
         baseMap.update();
         baseMap.printMap();
-        baseMap.replaceObjectToFloor(baseMap.player);
+        baseMap.replacePlayerToFloor();
         if (baseMap.playerIsDead()) {
             gameOver();
         } else {
