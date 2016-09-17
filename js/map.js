@@ -125,30 +125,6 @@ function map() {
         });
     }
 
-    function update() {
-        // clearMap();
-        if (!monster.dead) {
-            putMonster();
-        }
-        var pickedItem = pickUpItem().pickedItem;
-        if (pickedItem != null) {
-            replaceObjectToFloor(pickedItem)
-        }
-        if (metMonster()) {
-            player.life = player.life - 1;
-        }
-        if (playerIsDead()) {
-            player.symbol = String.fromCharCode(0xD83D, 0xDE31);
-        }
-        else if (isNearMonster()) {
-            player.symbol = String.fromCharCode(0xD83D, 0xDE2B);
-        } else {
-            player.symbol = String.fromCharCode(0xD83D, 0xDE04);
-        }
-        putPlayer();
-        showStatus();
-    }
-
     function showStatus() {
         var status = 'level:' + level + ', player.x:' + player.x + ', p.y:' + player.y + ', ' +
             String.fromCharCode(0x2665) + ' ' + player.life;
@@ -241,7 +217,7 @@ function map() {
         var doorIsOpen = false;
         var keySearch = searchItem(key);
         var playersKey = keySearch.foundItem;
-        if (keySearch.hasItem) {
+        if (playersKey.life > 0) {
             map[door.x][door.y] = floor;
             playersKey.life = playersKey.life - 1;
             doorIsOpen = true;
@@ -337,6 +313,30 @@ function map() {
         putItems();
         setDoor();
         level++;
+    }
+
+    function update() {
+        // clearMap();
+        if (!monster.dead) {
+            putMonster();
+        }
+        var pickedItem = pickUpItem().pickedItem;
+        if (pickedItem != null) {
+            replaceObjectToFloor(pickedItem)
+        }
+        if (metMonster()) {
+            player.life = player.life - 1;
+        }
+        if (playerIsDead()) {
+            player.symbol = String.fromCharCode(0xD83D, 0xDE31);
+        }
+        else if (isNearMonster()) {
+            player.symbol = String.fromCharCode(0xD83D, 0xDE2B);
+        } else {
+            player.symbol = String.fromCharCode(0xD83D, 0xDE04);
+        }
+        putPlayer();
+        showStatus();
     }
 
     return {
