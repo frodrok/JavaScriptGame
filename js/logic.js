@@ -14,12 +14,11 @@ function startGame() {
         } else {
             var input = prompt('Which direction would you like to go? [w]: up, [s]: down, [a]: left or [d]: right. ' +
                 'Enter [q] to stop getting prompts.');
-
             if (input !== null) {
                 input.toLowerCase();
             }
-            if (isDoor(input)) {
-                baseMap.openDoor();
+            if (isDoor(input) && baseMap.openDoor().doorIsOpen) {
+                baseMap.goToNewRoom();
             }
             var position = getPosition(input);
             if (position != null && position.isWall) {
