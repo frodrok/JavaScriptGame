@@ -17,7 +17,7 @@ function baseMap() {
     player.life = 3;
     monster.dead = false;
 
-    setObjectsLocation();
+    setPositionToObjects();
     clearPlayerColumnAndHammerRow();
     putItems();
     setDoor();
@@ -91,25 +91,25 @@ function baseMap() {
 
     function clearPlayerColumnAndHammerRow() {
 
-        map.forEach(function (elementX, indexX) {
+        map.forEach(function (rows, positionX) {
 
-            elementX.forEach(function (elementY, indexY) {
+            rows.forEach(function (columns, positionY) {
 
                 /* make the player row floor tiles */
-                if (!isOuterWall(indexX, indexY) && (indexX === hammer.x || indexY === player.y)) {
+                if (!isOuterWall(positionX, positionY) && (positionX === hammer.x || positionY === player.y)) {
 
-                    map[indexX][indexY] = floor;
+                    map[positionX][positionY] = floor;
                 }
             })
         })
     }
 
-    function isOuterWall(indexX, indexY) {
+    function isOuterWall(positionX, positionY) {
 
-        return indexX === 0 || indexX === 14 || indexY === 0 || indexY === 14;
+        return positionX === 0 || positionX === 14 || positionY === 0 || positionY === 14;
     }
 
-    function setObjectsLocation() {
+    function setPositionToObjects() {
         var firstIndexOfInnerMap = 1;
         var lastIndexOfInnerMap = 13;
         objects.forEach(function (object) {
@@ -121,7 +121,6 @@ function baseMap() {
     function update() {
         // clearMap();
         if (!monster.dead) {
-            player.symbol = String.fromCharCode(0xD83D, 0xDE04);
             putMonster();
         }
         var pickedItem = pickItem();
@@ -130,10 +129,9 @@ function baseMap() {
         }
         if (isNearMonster()) {
             player.symbol = String.fromCharCode(0xD83D, 0xDE2B);
-        } else if (metMonster()){
+        }
+        if (metMonster()) {
             player.life = player.life - 1;
-        } else {
-            player.symbol = String.fromCharCode(0xD83D, 0xDE04);
         }
         if (player.life <= 0) {
             player.symbol = String.fromCharCode(0xD83D, 0xDE31);
@@ -220,7 +218,7 @@ function baseMap() {
     }
 
     function smashWall(positionX, positionY) {
-        if (playerItems.includes(hammer)) {
+        if (!isOuterWall(positionX, positionY) && playerItems.includes(hammer)) {
             var indexOfHammer = playerItems.indexOf(hammer);
             var hammerLife = playerItems[indexOfHammer].life;
             if (hammerLife > 0) {
@@ -250,8 +248,8 @@ function baseMap() {
         }
     }
 
-    function metMonster(){
-        if(monster.x === player.x && monster.y === player.y) {
+    function metMonster() {
+        if (monster.x === player.x && monster.y === player.y) {
             return true;
         }
     }
@@ -267,12 +265,8 @@ function baseMap() {
             monster.dead = true;
             playerItems[indexOfSword].life = playerItems[indexOfSword].life - 1;
             player.symbol = String.fromCharCode(0xD83D, 0xDE04);
-        }
-        else if (!hasSword || swordLife <= 0) {
-            player.life = player.life - 1;
-            if (player.life <= 0) {
-                player.symbol = String.fromCharCode(0xD83D, 0xDE31);
-            }
+            monster.x = -1;
+            monster.y = -1;
         }
     }
 
