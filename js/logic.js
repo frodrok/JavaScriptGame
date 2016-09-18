@@ -10,7 +10,10 @@ function startGame() {
         baseMap.printMap();
         baseMap.replacePlayerToFloor();
 
-        if(!baseMap.playerIsDead()){
+        /* declare it here because of reuse on :34 */
+        var playerIsDead = baseMap.playerIsDead();
+
+        if(!playerIsDead && baseMap.getLevel() < 3) {
             var input = prompt('Which direction would you like to go? [w]: up, [s]: down, [a]: left or [d]: right. ' +
                 'Enter [q] to stop getting prompts.');
             if (input !== null) {
@@ -27,7 +30,7 @@ function startGame() {
             }
             handleInput(input);
         } else {
-            gameOver();
+            gameOver(playerIsDead);
         }
     }
 }
@@ -191,11 +194,21 @@ function getPosition(direction) {
     }
 }
 
-function gameOver() {
-    var gameOverSign = String.fromCharCode(0xD83C, 0xDFAE) + String.fromCharCode(0x274C);
-    console.log(gameOverSign + ' GAME OVER ' + gameOverSign);
-    playing = false;
-    var replayAnswer = prompt('Game over! Play again? y/n');
+function gameOver(playerIsDead) {
+    var replayAnswer;
+    var gameOverSign;
+    if (playerIsDead) {
+        gameOverSign = String.fromCharCode(0xD83C, 0xDFAE) + String.fromCharCode(0x274C);
+        console.log(gameOverSign + ' GAME OVER ' + gameOverSign);
+        playing = false;
+        replayAnswer = prompt('Game over! Play again? y/n');
+    } else {
+        gameOverSign = String.fromCharCode(0x2B50) + ' ' + String.fromCharCode(0x2B50);
+        console.log(gameOverSign + '    YOU WIN    ' + gameOverSign);
+        playing = false;
+        /* maybe change this text, I was a little too excited :D */
+        replayAnswer = prompt('YOU FUCKING DID IT, GOOD JOB! WANNA GO AGAIN?? y/n');
+    }
     if(replayAnswer != null){
         replayAnswer.toLowerCase();
     }

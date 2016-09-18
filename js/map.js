@@ -92,10 +92,6 @@ function map() {
         map[door.x][door.y] = door.symbol;
     }
 
-    function clearMap() {
-        /* TODO */
-    }
-
     function clearPlayerColumnAndHammerRow() {
 
         map.forEach(function (rows, positionX) {
@@ -112,7 +108,6 @@ function map() {
     }
 
     function isOuterWall(positionX, positionY) {
-
         return positionX === 0 || positionX === 14 || positionY === 0 || positionY === 14;
     }
 
@@ -126,8 +121,7 @@ function map() {
     }
 
     function showStatus() {
-        var status = 'level:' + level + ', player.x:' + player.x + ', p.y:' + player.y + ', ' +
-            String.fromCharCode(0x2665) + ' ' + player.life;
+        var status = 'level:' + level + String.fromCharCode(0x2665) + ' ' + player.life;
         for (var i = 0; i < playersItems.length; i++) {
             var playerItem = playersItems[i];
             status = status + ', ' + playerItem.symbol + ' ' + playerItem.life;
@@ -147,7 +141,6 @@ function map() {
 
     /* a start of collision detection */
     function checkNextTile(direction, x, y) {
-        console.log(direction);
         var available = false;
         var isDoor = false;
         var isWall = false;
@@ -339,6 +332,10 @@ function map() {
         showStatus();
     }
 
+    function getLevel() {
+        return level;
+    }
+
     return {
         player: player,
         update: update,
@@ -349,6 +346,7 @@ function map() {
         smashWall: smashWall,
         attackMonster: attackMonster,
         playerIsDead: playerIsDead,
-        goToNewRoom: goToNextRoom
+        goToNewRoom: goToNextRoom,
+        getLevel: getLevel
     }
 }
