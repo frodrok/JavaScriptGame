@@ -15,7 +15,7 @@ function map() {
     var map = generateBaseMap();
     var playersItems = player.items;
     var level = 1;
-    var restMonster = false;
+    var monsterRests = false;
     var restCount = 0;
 
     player.life = 3;
@@ -41,11 +41,12 @@ function map() {
 
                 var lastIndex = mapSize - 1;
 
-                /* first and last row should be '#' for walls */
+                /* first and last row should be wall */
                 if (i == 0 || i == lastIndex) {
                     oneRow[j] = wall;
                 } else {
 
+                    /* choose wall or floor randomly */
                     var chosenTile = chooseBetween(wall, floor);
 
                     /* left most tile and right most tile should be wall */
@@ -61,8 +62,10 @@ function map() {
         return innerMap;
     }
 
-    function chooseBetween(thing1, thing2) {
-        return Math.random() < 0.5 ? thing1 : thing2;
+    function printMap() {
+        for (var i = 0; i < map.length; i++) {
+            console.log(map[i].join(' '));
+        }
     }
 
     function putItems() {
@@ -73,17 +76,8 @@ function map() {
         })
     }
 
-    function putPlayer() {
-        map[player.x][player.y] = player.symbol;
-    }
-
-
-    function putMonster() {
-        map[monster.x][monster.y] = monster.symbol;
-    }
-
-    function getRandomInt(minNumber, maxNumber) {
-        return Math.floor(Math.random() * (maxNumber - minNumber)) + minNumber;
+    function putMovableObject(movableObject) {
+        map[movableObject.x][movableObject.y] = movableObject.symbol;
     }
 
     function setDoor() {
@@ -98,14 +92,9 @@ function map() {
     }
 
     function clearPlayerColumnAndHammerRow() {
-
         map.forEach(function (rows, positionX) {
-
             rows.forEach(function (columns, positionY) {
-
-                /* make the player row floor tiles */
                 if (!isOuterWall(positionX, positionY) && (positionX === hammer.x || positionY === player.y)) {
-
                     map[positionX][positionY] = floor;
                 }
             })
@@ -116,6 +105,7 @@ function map() {
         return positionX === 0 || positionX === 14 || positionY === 0 || positionY === 14;
     }
 
+    /* to set the first positions randomly */
     function setPositionToObjects() {
         var firstIndexOfInnerMap = 1;
         var lastIndexOfInnerMap = 13;
@@ -125,11 +115,13 @@ function map() {
             while (assigned === false) {
                 var x = getRandomInt(firstIndexOfInnerMap, lastIndexOfInnerMap);
                 var y = getRandomInt(firstIndexOfInnerMap, lastIndexOfInnerMap);
-                if (map[x][y] === floor || map[x][y] === wall) {
-                    object.x = x;
-                    object.y = y;
-                    assigned = true;
-                }
+                objects.forEach(function(anObject){
+                    if(map[x][y] !== anObject.symbol){
+                        object.x = x;
+                        object.y = y;
+                        assigned = true;
+                    }
+                });
             }
         });
     }
@@ -143,26 +135,29 @@ function map() {
         console.log(status);
     }
 
+    /* to replace the symbols of the movable objects to floor when they move out from the tile */
     function replaceMovableObjectToFloor(movableObject) {
         map[movableObject.x][movableObject.y] = floor;
     }
 
+    /* to replace object to floor when the player picked up or killed it */
     function replaceObjectToFloor(object) {
         map[object.x][object.y] = floor;
         object.x = -1;
         object.y = -1;
     }
 
-    /* a start of collision detection */
+    /* collision detection */
     function checkNextTile(direction, x, y) {
-        var available = false;
-        var isDoor = false;
-        var isWall = false;
-        var isMonster = false;
         var directionUp = map[x - 1][y];
         var directionLeft = map[x][y - 1];
         var directionDown = map[x + 1][y];
         var directionRight = map[x][y + 1];
+
+        var available = false;
+        var isDoor = false;
+        var isWall = false;
+        var isMonster = false;
         var positionX;
         var positionY;
 
@@ -205,7 +200,8 @@ function map() {
         };
     }
 
-    function searchItem(item) {
+    /*　check if player has the item */
+    function checkIfPlayerHas(item) {
         var hasItem = false;
         var foundItem = null;
         playersItems.forEach(function (playerItem) {
@@ -222,7 +218,7 @@ function map() {
 
     function openDoor() {
         door.isOpen = false;
-        var keySearch = searchItem(key);
+        var keySearch = checkIfPlayerHas(key);
         var playersKey = keySearch.foundItem;
         if (playersKey.life > 0) {
             map[door.x][door.y] = floor;
@@ -238,7 +234,7 @@ function map() {
     }
 
     function smashWall(positionX, positionY) {
-        var hammerSearch = searchItem(hammer);
+        var hammerSearch = checkIfPlayerHas(hammer);
         if (!isOuterWall(positionX, positionY) && hammerSearch.hasItem) {
             var playersHammer = hammerSearch.foundItem;
             if (playersHammer.life > 0) {
@@ -252,7 +248,7 @@ function map() {
         var pickedItem = null;
         items.forEach(function (item) {
             if (player.x === item.x && player.y === item.y) {
-                var itemSearch = searchItem(item);
+                var itemSearch = checkIfPlayerHas(item);
                 if (itemSearch.hasItem) {
                     var playersItem = itemSearch.foundItem;
                     playersItem.life = playersItem.life + item.life;
@@ -261,6 +257,7 @@ function map() {
                     playersItems.push(newItem);
                 }
                 pickedItem = item;
+                replaceObjectToFloor(pickedItem);
             }
         });
         return {
@@ -284,27 +281,19 @@ function map() {
     }
 
     function attackMonster(positionX, positionY) {
-        var swordSearch = searchItem(sword);
+        var swordSearch = checkIfPlayerHas(sword);
         var playersSword = swordSearch.foundItem;
         if (swordSearch.hasItem && playersSword.life > 0) {
-            map[positionX][positionY] = floor;
+            replaceObjectToFloor(monster);
             monster.dead = true;
             playersSword.life = playersSword.life - 1;
             player.symbol = String.fromCharCode(0xD83D, 0xDE04);
-            monster.x = -1;
-            monster.y = -1;
         }
     }
 
     function playerIsDead() {
         if (player.life <= 0) {
             return true;
-        }
-    }
-
-    function printMap() {
-        for (var i = 0; i < map.length; i++) {
-            console.log(map[i].join(' '));
         }
     }
 
@@ -342,37 +331,43 @@ function map() {
         }
     }
 
-    function update() {
-        var pickedItem = pickUpItem().pickedItem;
-        if (pickedItem != null) {
-            replaceObjectToFloor(pickedItem)
-        }
-        if (!monster.dead && (!restMonster || restCount > 2)) {
+    function handleMonsterMovement(){
+        if (!monster.dead && (!monsterRests || restCount > 2)) {
             replaceMovableObjectToFloor(monster);
             setMonsterPosition();
-            restMonster = false;
+            monsterRests = false;
         }
-        putItems();
-        if (!monster.dead) {
-            putMonster();
-        }
+    }
+
+    function handleBattle(){
         if (metMonster()) {
             attackMonster(monster.x, monster.y);
             if (!monster.dead) {
                 player.life = player.life - 1;
-                restMonster = true;
+                restCount = 0;
+                monsterRests = true;
             }
         }
-        if (restMonster) {
+        if (monsterRests) {
             restCount++;
         }
-        changePlayerFace();
-        putPlayer();
-        showStatus();
     }
 
     function getLevel() {
         return level;
+    }
+
+    function update() {
+        pickUpItem();
+        handleMonsterMovement();
+        putItems();
+        if (!monster.dead) {
+            putMovableObject(monster);
+        }
+        handleBattle();
+        changePlayerFace();
+        putMovableObject(player);
+        showStatus();
     }
 
     return {

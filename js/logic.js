@@ -26,10 +26,10 @@ function startGame() {
 function askDirection() {
     var input = prompt('Which direction would you like to go? [w]: up, [s]: down, [a]: left or [d]: right. ' +
         'Enter [q] to stop getting prompts.');
+
     if (input !== null) {
         input.toLowerCase();
     }
-
     return input
 }
 
@@ -108,92 +108,28 @@ function isWalkable(direction) {
 }
 
 function getPosition(direction) {
-
     var nextTile;
+
     switch (direction) {
 
         case 'w':
             nextTile = baseMap.checkNextTile('w', baseMap.player.x, baseMap.player.y);
-            if (nextTile.isWall) {
-                return {
-                    isWall: nextTile.isWall,
-                    x: nextTile.positionX,
-                    y: nextTile.positionY
-                }
-            } else if (nextTile.isMonster) {
-                return {
-                    isMonster: nextTile.isMonster,
-                    x: nextTile.positionX,
-                    y: nextTile.positionY
-                }
-            } else if (nextTile.isDoor) {
-                return {
-                    isDoor: nextTile.isDoor
-                }
-            }
+            return getNextTile(nextTile);
             break;
 
         case 'a':
             nextTile = baseMap.checkNextTile('a', baseMap.player.x, baseMap.player.y);
-            if (nextTile.isWall) {
-                return {
-                    isWall: nextTile.isWall,
-                    x: nextTile.positionX,
-                    y: nextTile.positionY
-                }
-            } else if (nextTile.isMonster) {
-                return {
-                    isMonster: nextTile.isMonster,
-                    x: nextTile.positionX,
-                    y: nextTile.positionY
-                }
-            } else if (nextTile.isDoor) {
-                return {
-                    isDoor: nextTile.isDoor
-                }
-            }
+            return getNextTile(nextTile);
             break;
 
         case 's':
             nextTile = baseMap.checkNextTile('s', baseMap.player.x, baseMap.player.y);
-            if (nextTile.isWall) {
-                return {
-                    isWall: nextTile.isWall,
-                    x: nextTile.positionX,
-                    y: nextTile.positionY
-                }
-            } else if (nextTile.isMonster) {
-                return {
-                    isMonster: nextTile.isMonster,
-                    x: nextTile.positionX,
-                    y: nextTile.positionY
-                }
-            } else if (nextTile.isDoor) {
-                return {
-                    isDoor: nextTile.isDoor
-                }
-            }
+            return getNextTile(nextTile);
             break;
 
         case 'd':
             nextTile = baseMap.checkNextTile('d', baseMap.player.x, baseMap.player.y);
-            if (nextTile.isWall) {
-                return {
-                    isWall: nextTile.isWall,
-                    x: nextTile.positionX,
-                    y: nextTile.positionY
-                }
-            } else if (nextTile.isMonster) {
-                return {
-                    isMonster: nextTile.isMonster,
-                    x: nextTile.positionX,
-                    y: nextTile.positionY
-                }
-            } else if (nextTile.isDoor) {
-                return {
-                    isDoor: nextTile.isDoor
-                }
-            }
+            return getNextTile(nextTile);
             break;
 
         default:
@@ -201,12 +137,32 @@ function getPosition(direction) {
     }
 }
 
+function getNextTile(nextTile){
+    if (nextTile.isWall) {
+        return {
+            isWall: nextTile.isWall,
+            x: nextTile.positionX,
+            y: nextTile.positionY
+        }
+    } else if (nextTile.isMonster) {
+        return {
+            isMonster: nextTile.isMonster,
+            x: nextTile.positionX,
+            y: nextTile.positionY
+        }
+    } else if (nextTile.isDoor) {
+        return {
+            isDoor: nextTile.isDoor
+        }
+    }
+}
+
 function gameOver(playerIsDead) {
     var replayAnswer;
     var gameOverSign;
     if (playerIsDead) {
-        gameOverSign = String.fromCharCode(0xD83C, 0xDFAE) + String.fromCharCode(0x274C);
-        console.log(gameOverSign + ' GAME OVER ' + gameOverSign);
+        gameOverSign = String.fromCharCode(0xD83C, 0xDFAE) + ' ' + String.fromCharCode(0x274C);
+        console.log(gameOverSign + '    GAME OVER    ' + gameOverSign);
         playing = false;
         replayAnswer = prompt('Game over! Play again? y/n');
     } else {
