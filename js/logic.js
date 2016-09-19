@@ -8,26 +8,38 @@ function startGame() {
         console.clear();
         baseMap.update();
         baseMap.printMap();
-        baseMap.replacePlayerToFloor();
+        baseMap.replaceMovableObjectToFloor(baseMap.player);
 
         if(!baseMap.playerIsDead()){
-            var input = prompt('Which direction would you like to go? [w]: up, [s]: down, [a]: left or [d]: right. ' +
-                'Enter [q] to stop getting prompts.');
-            if (input !== null) {
-                input.toLowerCase();
-            }
-            if (isDoor(input) && baseMap.openDoor().doorIsOpen) {
-                baseMap.goToNewRoom();
-            }
-            var position = getPosition(input);
-            if (position != null && position.isWall) {
-                baseMap.smashWall(position.x, position.y);
-            } else if (position != null && position.isMonster) {
-                baseMap.attackMonster(position.x, position.y);
-            }
+            var input = askDirection();
+            handlePosition(input);
             handleInput(input);
         } else {
             gameOver();
+        }
+    }
+}
+
+function askDirection(){
+    var input = prompt('Which direction would you like to go? [w]: up, [s]: down, [a]: left or [d]: right. ' +
+        'Enter [q] to stop getting prompts.');
+    if (input !== null) {
+        input.toLowerCase();
+    }
+
+    return input
+}
+
+function handlePosition(input){
+    var position = getPosition(input);
+
+    if(position != null) {
+        if (position.isDoor && baseMap.openDoor().doorIsOpen) {
+            baseMap.goToNewRoom();
+        }else if (position.isWall) {
+            baseMap.smashWall(position.x, position.y);
+        } else if (position.isMonster) {
+            baseMap.attackMonster(position.x, position.y);
         }
     }
 }
@@ -92,27 +104,6 @@ function isWalkable(direction) {
     }
 }
 
-function isDoor(direction) {
-
-    switch (direction) {
-        case 'w':
-            return baseMap.checkNextTile('w', baseMap.player.x, baseMap.player.y).isDoor;
-            break;
-
-        case 'a':
-            return baseMap.checkNextTile('a', baseMap.player.x, baseMap.player.y).isDoor;
-            break;
-
-        case 's':
-            return baseMap.checkNextTile('s', baseMap.player.x, baseMap.player.y).isDoor;
-            break;
-
-        case 'd':
-            return baseMap.checkNextTile('d', baseMap.player.x, baseMap.player.y).isDoor;
-            break;
-    }
-}
-
 function getPosition(direction) {
 
     var nextTile;
@@ -132,6 +123,10 @@ function getPosition(direction) {
                     x: nextTile.positionX,
                     y: nextTile.positionY
                 }
+            } else if (nextTile.isDoor) {
+                return {
+                    isDoor: nextTile.isDoor
+                }
             }
             break;
 
@@ -148,6 +143,10 @@ function getPosition(direction) {
                     isMonster: nextTile.isMonster,
                     x: nextTile.positionX,
                     y: nextTile.positionY
+                }
+            } else if (nextTile.isDoor) {
+                return {
+                    isDoor: nextTile.isDoor
                 }
             }
             break;
@@ -166,6 +165,10 @@ function getPosition(direction) {
                     x: nextTile.positionX,
                     y: nextTile.positionY
                 }
+            } else if (nextTile.isDoor) {
+                return {
+                    isDoor: nextTile.isDoor
+                }
             }
             break;
 
@@ -182,6 +185,10 @@ function getPosition(direction) {
                     isMonster: nextTile.isMonster,
                     x: nextTile.positionX,
                     y: nextTile.positionY
+                }
+            } else if (nextTile.isDoor) {
+                return {
+                    isDoor: nextTile.isDoor
                 }
             }
             break;
