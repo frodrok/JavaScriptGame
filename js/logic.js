@@ -13,27 +13,9 @@ function startGame() {
         /* declare it here because of reuse on :34 */
         var playerIsDead = baseMap.playerIsDead();
 
-        if(!playerIsDead && baseMap.getLevel() < 3) {
-            // var input = prompt('Which direction would you like to go? [w]: up, [s]: down, [a]: left or [d]: right. ' +
-            //     'Enter [q] to stop getting prompts.');
-            // if (input !== null) {
-            //     input.toLowerCase();
-            // }
+        if (!playerIsDead && baseMap.getLevel() < 3) {
             var input = askDirection();
-//             if (isDoor(input) && baseMap.openDoor().doorIsOpen) {
-//                 baseMap.goToNewRoom();
-//             }
-//             var position = getPosition(input);
-//             if (position != null && position.isWall) {
-//                 baseMap.smashWall(position.x, position.y);
-//             } else if (position != null && position.isMonster) {
-//                 baseMap.attackMonster(position.x, position.y);
-//             }
-// =======
-//         if(!baseMap.playerIsDead()){
-//             var input = askDirection();
             handlePosition(input);
-// >>>>>>> remotes/origin/underScore
             handleInput(input);
         } else {
             gameOver(playerIsDead);
@@ -41,7 +23,7 @@ function startGame() {
     }
 }
 
-function askDirection(){
+function askDirection() {
     var input = prompt('Which direction would you like to go? [w]: up, [s]: down, [a]: left or [d]: right. ' +
         'Enter [q] to stop getting prompts.');
     if (input !== null) {
@@ -51,13 +33,13 @@ function askDirection(){
     return input
 }
 
-function handlePosition(input){
+function handlePosition(input) {
     var position = getPosition(input);
 
-    if(position != null) {
+    if (position != null) {
         if (position.isDoor && baseMap.openDoor().doorIsOpen) {
             baseMap.goToNewRoom();
-        }else if (position.isWall) {
+        } else if (position.isWall) {
             baseMap.smashWall(position.x, position.y);
         } else if (position.isMonster) {
             baseMap.attackMonster(position.x, position.y);
@@ -234,10 +216,10 @@ function gameOver(playerIsDead) {
         /* maybe change this text, I was a little too excited :D */
         replayAnswer = prompt('YOU FUCKING DID IT, GOOD JOB! WANNA GO AGAIN?? y/n');
     }
-    if(replayAnswer != null){
+    if (replayAnswer != null) {
         replayAnswer.toLowerCase();
     }
-    if(replayAnswer === 'y'){
+    if (replayAnswer === 'y') {
         baseMap = map();
         startGame();
     }

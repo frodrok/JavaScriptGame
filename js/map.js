@@ -319,14 +319,15 @@ function map() {
         level++;
     }
 
+    /* simple monster movement */
     function setMonsterPosition() {
         if (player.x > monster.x && checkNextTile('s', monster.x, monster.y).available) {
             monster.moveDown();
         } else if (player.y > monster.y && checkNextTile('d', monster.x, monster.y).available) {
             monster.moveRight();
-        }else if (player.x < monster.x && checkNextTile('w', monster.x, monster.y).available) {
+        } else if (player.x < monster.x && checkNextTile('w', monster.x, monster.y).available) {
             monster.moveUp();
-        }  else if (player.y < monster.y && checkNextTile('a', monster.x, monster.y).available) {
+        } else if (player.y < monster.y && checkNextTile('a', monster.x, monster.y).available) {
             monster.moveLeft();
         }
     }
@@ -352,7 +353,7 @@ function map() {
             restMonster = false;
         }
         putItems();
-        if(!monster.dead) {
+        if (!monster.dead) {
             putMonster();
         }
         if (metMonster()) {
@@ -362,7 +363,7 @@ function map() {
                 restMonster = true;
             }
         }
-        if(restMonster){
+        if (restMonster) {
             restCount++;
         }
         changePlayerFace();
