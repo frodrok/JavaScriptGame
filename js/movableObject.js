@@ -1,5 +1,5 @@
-var MovableObject = function(x, y) {
-    
+var MovableObject = function (x, y) {
+
     var that = {};
 
     that.symbol = 'X';
@@ -16,24 +16,23 @@ var MovableObject = function(x, y) {
         that.y = y;
     }
 
-    that.moveUp = function() {
+    that.moveUp = function () {
         that.x = that.x - 1;
     };
 
-    that.moveRight = function() {
+    that.moveRight = function () {
         that.y = that.y + 1;
     };
 
-    that.moveLeft = function() {
+    that.moveLeft = function () {
         that.y = that.y - 1;
     };
 
-    that.moveDown = function() {
+    that.moveDown = function () {
         that.x = that.x + 1;
     };
 
     return that;
-
 };
 
 
