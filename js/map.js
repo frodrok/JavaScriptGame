@@ -9,12 +9,14 @@ function map() {
     var key = {name: 'key', life: 1, symbol: String.fromCharCode(0xD83D, 0xDD11), x: 10, y: 13};
     var hammer = {name: 'hammer', life: 3, symbol: String.fromCharCode(0xD83D, 0xDD28), x: 5, y: 8};
     var sword = {name: 'sword', life: 1, symbol: String.fromCharCode(0xD83D, 0xDDE1), x: 4, y: 13};
-    var door = {symbol: String.fromCharCode(0xD83D, 0xDEAA)};
+    var door = {symbol: String.fromCharCode(0xD83D, 0xDEAA), isOpen: false};
     var items = [key, hammer, sword];
     var objects = [player, key, hammer, monster, sword];
     var map = generateBaseMap();
     var playersItems = player.items;
     var level = 1;
+    var restMonster = false;
+    var restCount = 0;
 
     player.life = 3;
     monster.dead = false;
@@ -22,7 +24,7 @@ function map() {
         {name: 'key', life: 0, symbol: key.symbol},
         {name: 'hammer', life: 0, symbol: hammer.symbol},
         {name: 'sword', life: 0, symbol: sword.symbol}
-        );
+    );
 
     setPositionToObjects();
     clearPlayerColumnAndHammerRow();
@@ -65,13 +67,16 @@ function map() {
 
     function putItems() {
         items.forEach(function (item) {
-            map[item.x][item.y] = item.symbol;
+            if (item.x !== -1 || item.y !== -1) {
+                map[item.x][item.y] = item.symbol;
+            }
         })
     }
 
     function putPlayer() {
         map[player.x][player.y] = player.symbol;
     }
+
 
     function putMonster() {
         map[monster.x][monster.y] = monster.symbol;
@@ -114,14 +119,23 @@ function map() {
     function setPositionToObjects() {
         var firstIndexOfInnerMap = 1;
         var lastIndexOfInnerMap = 13;
+
         objects.forEach(function (object) {
-            object.x = getRandomInt(firstIndexOfInnerMap, lastIndexOfInnerMap);
-            object.y = getRandomInt(firstIndexOfInnerMap, lastIndexOfInnerMap);
+            var assigned = false;
+            while (assigned === false) {
+                var x = getRandomInt(firstIndexOfInnerMap, lastIndexOfInnerMap);
+                var y = getRandomInt(firstIndexOfInnerMap, lastIndexOfInnerMap);
+                if (map[x][y] === floor || map[x][y] === wall) {
+                    object.x = x;
+                    object.y = y;
+                    assigned = true;
+                }
+            }
         });
     }
 
     function showStatus() {
-        var status = 'level:' + level + String.fromCharCode(0x2665) + ' ' + player.life;
+        var status = 'level:' + level + ', ' + String.fromCharCode(0x2665) + ' ' + player.life;
         for (var i = 0; i < playersItems.length; i++) {
             var playerItem = playersItems[i];
             status = status + ', ' + playerItem.symbol + ' ' + playerItem.life;
@@ -129,8 +143,8 @@ function map() {
         console.log(status);
     }
 
-    function replacePlayerToFloor() {
-        map[player.x][player.y] = floor;
+    function replaceMovableObjectToFloor(movableObject) {
+        map[movableObject.x][movableObject.y] = floor;
     }
 
     function replaceObjectToFloor(object) {
@@ -207,27 +221,25 @@ function map() {
     }
 
     function openDoor() {
-        var doorIsOpen = false;
+        door.isOpen = false;
         var keySearch = searchItem(key);
         var playersKey = keySearch.foundItem;
         if (playersKey.life > 0) {
             map[door.x][door.y] = floor;
             playersKey.life = playersKey.life - 1;
-            doorIsOpen = true;
+            door.isOpen = true;
             if (monster.x >= 0 && monster.y >= 0) {
                 map[monster.x][monster.y] = floor;
             }
         }
         return {
-            doorIsOpen: doorIsOpen
+            doorIsOpen: door.isOpen
         };
     }
 
     function smashWall(positionX, positionY) {
         var hammerSearch = searchItem(hammer);
         if (!isOuterWall(positionX, positionY) && hammerSearch.hasItem) {
-            // var indexOfHammer = playersItems.indexOf(hammer);
-            // var hammerLife = playersItems[indexOfHammer].life;
             var playersHammer = hammerSearch.foundItem;
             if (playersHammer.life > 0) {
                 map[positionX][positionY] = floor;
@@ -298,7 +310,6 @@ function map() {
 
     function goToNextRoom() {
         monster.dead = false;
-        // setPositionToPlayer();
         map = generateBaseMap();
         setPositionToObjects();
         console.log(monster.x + ', ' + monster.y);
@@ -308,26 +319,53 @@ function map() {
         level++;
     }
 
-    function update() {
-        // clearMap();
-        if (!monster.dead) {
-            putMonster();
+    function setMonsterPosition() {
+        if (player.x > monster.x && checkNextTile('s', monster.x, monster.y).available) {
+            monster.moveDown();
+        } else if (player.y > monster.y && checkNextTile('d', monster.x, monster.y).available) {
+            monster.moveRight();
+        }else if (player.x < monster.x && checkNextTile('w', monster.x, monster.y).available) {
+            monster.moveUp();
+        }  else if (player.y < monster.y && checkNextTile('a', monster.x, monster.y).available) {
+            monster.moveLeft();
         }
-        var pickedItem = pickUpItem().pickedItem;
-        if (pickedItem != null) {
-            replaceObjectToFloor(pickedItem)
-        }
-        if (metMonster()) {
-            player.life = player.life - 1;
-        }
+    }
+
+    function changePlayerFace() {
         if (playerIsDead()) {
-            player.symbol = String.fromCharCode(0xD83D, 0xDE31);
-        }
-        else if (isNearMonster()) {
+            player.symbol = String.fromCharCode(0xD83D, 0xDE31)
+        } else if (isNearMonster()) {
             player.symbol = String.fromCharCode(0xD83D, 0xDE2B);
         } else {
             player.symbol = String.fromCharCode(0xD83D, 0xDE04);
         }
+    }
+
+    function update() {
+        var pickedItem = pickUpItem().pickedItem;
+        if (pickedItem != null) {
+            replaceObjectToFloor(pickedItem)
+        }
+        if (!monster.dead && (!restMonster || restCount > 2)) {
+            replaceMovableObjectToFloor(monster);
+            setMonsterPosition();
+            restMonster = false;
+        }
+        putItems();
+        if(!monster.dead) {
+            putMonster();
+        }
+        if (metMonster()) {
+            attackMonster(monster.x, monster.y);
+            if (!monster.dead) {
+                player.life = player.life - 1;
+                restMonster = true;
+            }
+        }
+        if(restMonster){
+            restCount++;
+        }
+        changePlayerFace();
         putPlayer();
         showStatus();
     }
@@ -339,7 +377,7 @@ function map() {
     return {
         player: player,
         update: update,
-        replacePlayerToFloor: replacePlayerToFloor,
+        replaceMovableObjectToFloor: replaceMovableObjectToFloor,
         checkNextTile: checkNextTile,
         printMap: printMap,
         openDoor: openDoor,
