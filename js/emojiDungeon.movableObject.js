@@ -20,15 +20,20 @@ emojiDungeon.movableObject = function () {
         }
     }
 
-    var player = createMovableObject(String.fromCharCode(0xD83D, 0xDE04));
-    player.life = 3;
-    player.items = [];
-    player.items.push(
-        {name: 'key', life: 0, symbol: emojiDungeon.item().key.symbol},
-        {name: 'hammer', life: 0, symbol: emojiDungeon.item().hammer.symbol},
-        {name: 'sword', life: 0, symbol: emojiDungeon.item().sword.symbol}
-    );
+    function createPlayer() {
+        var that = createMovableObject(String.fromCharCode(0xD83D, 0xDE04));
 
+        that.life = 3;
+        that.items = [];
+        that.items.push(
+            {name: 'key', life: 0, symbol: emojiDungeon.item().key.symbol},
+            {name: 'hammer', life: 0, symbol: emojiDungeon.item().hammer.symbol},
+            {name: 'sword', life: 0, symbol: emojiDungeon.item().sword.symbol}
+        );
+        return that;
+    }
+
+    var player = createPlayer();
     var monster = createMovableObject(String.fromCharCode(0xD83D, 0xDC79));
 
     return {
