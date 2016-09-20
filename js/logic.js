@@ -10,12 +10,11 @@ function startGame() {
         baseMap.printMap();
         baseMap.replaceMovableObjectToFloor(baseMap.player);
 
-        /* declare it here because of reuse on :34 */
         var playerIsDead = baseMap.playerIsDead();
 
         if (!playerIsDead && baseMap.getLevel() < 3) {
             var input = askDirection();
-            handlePosition(input);
+            handleNextAction(input);
             handleInput(input);
         } else {
             gameOver(playerIsDead);
@@ -33,7 +32,7 @@ function askDirection() {
     return input
 }
 
-function handlePosition(input) {
+function handleNextAction(input) {
     var position = getPosition(input);
 
     if (position != null) {
@@ -114,22 +113,22 @@ function getPosition(direction) {
 
         case 'w':
             nextTile = baseMap.checkNextTile('w', baseMap.player.x, baseMap.player.y);
-            return getNextTile(nextTile);
+            return getNextTileInfo(nextTile);
             break;
 
         case 'a':
             nextTile = baseMap.checkNextTile('a', baseMap.player.x, baseMap.player.y);
-            return getNextTile(nextTile);
+            return getNextTileInfo(nextTile);
             break;
 
         case 's':
             nextTile = baseMap.checkNextTile('s', baseMap.player.x, baseMap.player.y);
-            return getNextTile(nextTile);
+            return getNextTileInfo(nextTile);
             break;
 
         case 'd':
             nextTile = baseMap.checkNextTile('d', baseMap.player.x, baseMap.player.y);
-            return getNextTile(nextTile);
+            return getNextTileInfo(nextTile);
             break;
 
         default:
@@ -137,7 +136,7 @@ function getPosition(direction) {
     }
 }
 
-function getNextTile(nextTile){
+function getNextTileInfo(nextTile){
     if (nextTile.isWall) {
         return {
             isWall: nextTile.isWall,
