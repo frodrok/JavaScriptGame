@@ -1,4 +1,4 @@
-emojiDungeon.item = function() {
+emojiDungeon.item = function () {
 
     var item = {
         name: 'item',

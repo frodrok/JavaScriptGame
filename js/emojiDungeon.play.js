@@ -138,7 +138,7 @@ emojiDungeon.play = function () {
         }
     }
 
-    function getNextTileInfo(nextTile){
+    function getNextTileInfo(nextTile) {
         if (nextTile.isWall) {
             return {
                 isWall: nextTile.isWall,

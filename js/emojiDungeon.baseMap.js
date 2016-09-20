@@ -1,13 +1,13 @@
-emojiDungeon.baseMap = function() {
+emojiDungeon.baseMap = function () {
 
     var floor = String.fromCharCode(0x2B1C);
     var wall = String.fromCharCode(0x2B1B);
+    var door = {symbol: String.fromCharCode(0xD83D, 0xDEAA), isOpen: false};
     var player = emojiDungeon.movableObject().player;
     var monster = emojiDungeon.movableObject().monster;
     var key = emojiDungeon.item().key;
     var hammer = emojiDungeon.item().hammer;
     var sword = emojiDungeon.item().sword;
-    var door = {symbol: String.fromCharCode(0xD83D, 0xDEAA), isOpen: false};
     var items = [key, hammer, sword];
     var objects = [player, key, hammer, monster, sword];
     var mapSize = 15;
