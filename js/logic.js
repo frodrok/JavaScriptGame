@@ -41,7 +41,7 @@ function handleNextAction(input) {
         } else if (position.isWall) {
             baseMap.smashWall(position.x, position.y);
         } else if (position.isMonster) {
-            baseMap.attackMonster(position.x, position.y);
+            baseMap.attackMonster();
         }
     }
 }

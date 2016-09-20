@@ -295,7 +295,7 @@ function map() {
         }
     }
 
-    function attackMonster(positionX, positionY) {
+    function attackMonster() {
         var swordSearch = checkIfPlayerHas(sword);
         var playersSword = swordSearch.foundItem;
         if (swordSearch.hasItem && playersSword.life > 0) {
