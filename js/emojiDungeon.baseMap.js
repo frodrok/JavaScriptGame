@@ -1,30 +1,23 @@
-function map() {
+emojiDungeon.baseMap = function() {
 
     var floor = String.fromCharCode(0x2B1C);
     var wall = String.fromCharCode(0x2B1B);
-    var player = new Player(3, 3);
-    var monster = new Monster(6, 6);
-    var mapSize = 15;
-
-    var key = {name: 'key', life: 1, symbol: String.fromCharCode(0xD83D, 0xDD11), x: 10, y: 13};
-    var hammer = {name: 'hammer', life: 3, symbol: String.fromCharCode(0xD83D, 0xDD28), x: 5, y: 8};
-    var sword = {name: 'sword', life: 1, symbol: String.fromCharCode(0xD83D, 0xDDE1), x: 4, y: 13};
+    var player = emojiDungeon.movableObject().player;
+    var monster = emojiDungeon.movableObject().monster;
+    var key = emojiDungeon.item().key;
+    var hammer = emojiDungeon.item().hammer;
+    var sword = emojiDungeon.item().sword;
     var door = {symbol: String.fromCharCode(0xD83D, 0xDEAA), isOpen: false};
     var items = [key, hammer, sword];
     var objects = [player, key, hammer, monster, sword];
+    var mapSize = 15;
+    var firstIndexOfOuterWall = 0;
+    var lastIndexOfOuterWall = mapSize - 1;
     var map = generateBaseMap();
     var playersItems = player.items;
     var level = 1;
     var monsterRests = false;
     var restCount = 0;
-
-    player.life = 3;
-    monster.dead = false;
-    playersItems.push(
-        {name: 'key', life: 0, symbol: key.symbol},
-        {name: 'hammer', life: 0, symbol: hammer.symbol},
-        {name: 'sword', life: 0, symbol: sword.symbol}
-    );
 
     setPositionToObjects();
     clearPlayerColumnAndHammerRow();
@@ -60,7 +53,7 @@ function map() {
                 } else {
 
                     /* choose wall or floor randomly */
-                    var chosenTile = chooseBetween(wall, floor);
+                    var chosenTile = emojiDungeon.randomUtils().chooseBetween(wall, floor);
 
                     /* left most tile and right most tile should be wall */
                     if (j == 0 || j == lastIndex) {
@@ -94,12 +87,13 @@ function map() {
     }
 
     function setDoor() {
-        door.x = getRandomInt(0, 15);
-        var doorPositionChoice = getRandomInt(1, 14);
-        if (door.x == 0 || door.x == 14) {
-            door.y = doorPositionChoice;
+        door.x = emojiDungeon.randomUtils().getRandomInt(firstIndexOfOuterWall, lastIndexOfOuterWall + 1);
+        if (door.x == firstIndexOfOuterWall || door.x == lastIndexOfOuterWall) {
+            var firstIndexOfInnerWall = firstIndexOfOuterWall + 1;
+            var lastIndexOfInnerWall = lastIndexOfOuterWall - 1;
+            door.y = emojiDungeon.randomUtils().getRandomInt(firstIndexOfInnerWall, lastIndexOfInnerWall + 1);
         } else {
-            door.y = chooseBetween(0, 14);
+            door.y = emojiDungeon.randomUtils().chooseBetween(firstIndexOfOuterWall, lastIndexOfOuterWall);
         }
         map[door.x][door.y] = door.symbol;
     }
@@ -115,7 +109,8 @@ function map() {
     }
 
     function isOuterWall(positionX, positionY) {
-        return positionX === 0 || positionX === 14 || positionY === 0 || positionY === 14;
+        return positionX === firstIndexOfOuterWall || positionX === lastIndexOfOuterWall ||
+            positionY === firstIndexOfOuterWall || positionY === lastIndexOfOuterWall;
     }
 
     /* to set the first positions randomly */
@@ -126,14 +121,14 @@ function map() {
         var length = objects.length;
         var i, j;
         for (i = 0; i < length; i++) {
-            objects[i].x = getRandomInt(firstIndexOfInnerMap, lastIndexOfInnerMap);
-            objects[i].y = getRandomInt(firstIndexOfInnerMap, lastIndexOfInnerMap);
+            objects[i].x = emojiDungeon.randomUtils().getRandomInt(firstIndexOfInnerMap, lastIndexOfInnerMap);
+            objects[i].y = emojiDungeon.randomUtils().getRandomInt(firstIndexOfInnerMap, lastIndexOfInnerMap);
             for (j = i + 1; j < length; j++) {
-                var x = null;
-                var y = null;
-                while (x === null || y === null || (objects[i].x === x && objects[i].y === y)) {
-                    x = getRandomInt(firstIndexOfInnerMap, lastIndexOfInnerMap);
-                    y = getRandomInt(firstIndexOfInnerMap, lastIndexOfInnerMap);
+                var x = -1;
+                var y = -1;
+                while (x === -1 || y === -1 || (objects[i].x === x && objects[i].y === y)) {
+                    x = emojiDungeon.randomUtils().getRandomInt(firstIndexOfInnerMap, lastIndexOfInnerMap);
+                    y = emojiDungeon.randomUtils().getRandomInt(firstIndexOfInnerMap, lastIndexOfInnerMap);
                 }
                 objects[j].x = x;
                 objects[j].y = y;
@@ -176,6 +171,7 @@ function map() {
         var positionX;
         var positionY;
 
+        //TODO: separate the method
         if (direction === 'w') {
             isDoor = (directionUp === door.symbol);
             isWall = (directionUp === wall);
@@ -385,4 +381,4 @@ function map() {
         goToNewRoom: goToNextRoom,
         getLevel: getLevel
     }
-}
+};
