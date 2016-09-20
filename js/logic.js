@@ -181,4 +181,3 @@ function gameOver(playerIsDead) {
 }
 
 startGame();
-
