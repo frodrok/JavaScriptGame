@@ -6,4 +6,3 @@ var Player = function (x, y) {
     that.items = [];
     return that;
 };
-

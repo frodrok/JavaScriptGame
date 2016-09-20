@@ -34,6 +34,3 @@ var MovableObject = function (x, y) {
 
     return that;
 };
-
-
-

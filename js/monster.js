@@ -5,5 +5,3 @@ var Monster = function (x, y) {
 
     return that;
 };
-
-
