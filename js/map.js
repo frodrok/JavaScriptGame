@@ -31,6 +31,19 @@ function map() {
     putItems();
     setDoor();
 
+    function update() {
+        pickUpItem();
+        handleMonsterMovement();
+        putItems();
+        if (!monster.dead) {
+            putMovableObject(monster);
+        }
+        handleBattle();
+        changePlayerFace();
+        putMovableObject(player);
+        showStatus();
+    }
+
     function generateBaseMap() {
         var innerMap = new Array(mapSize);
 
@@ -110,20 +123,22 @@ function map() {
         var firstIndexOfInnerMap = 1;
         var lastIndexOfInnerMap = 13;
 
-        objects.forEach(function (object) {
-            var assigned = false;
-            while (assigned === false) {
-                var x = getRandomInt(firstIndexOfInnerMap, lastIndexOfInnerMap);
-                var y = getRandomInt(firstIndexOfInnerMap, lastIndexOfInnerMap);
-                objects.forEach(function(anObject){
-                    if(map[x][y] !== anObject.symbol){
-                        object.x = x;
-                        object.y = y;
-                        assigned = true;
-                    }
-                });
+        var length = objects.length;
+        var i, j;
+        for (i = 0; i < length; i++) {
+            objects[i].x = getRandomInt(firstIndexOfInnerMap, lastIndexOfInnerMap);
+            objects[i].y = getRandomInt(firstIndexOfInnerMap, lastIndexOfInnerMap);
+            for (j = i + 1; j < length; j++) {
+                var x = null;
+                var y = null;
+                while (x === null || y === null || (objects[i].x === x && objects[i].y === y)) {
+                    x = getRandomInt(firstIndexOfInnerMap, lastIndexOfInnerMap);
+                    y = getRandomInt(firstIndexOfInnerMap, lastIndexOfInnerMap);
+                }
+                objects[j].x = x;
+                objects[j].y = y;
             }
-        });
+        }
     }
 
     function showStatus() {
@@ -331,7 +346,7 @@ function map() {
         }
     }
 
-    function handleMonsterMovement(){
+    function handleMonsterMovement() {
         if (!monster.dead && (!monsterRests || restCount > 2)) {
             replaceMovableObjectToFloor(monster);
             setMonsterPosition();
@@ -339,7 +354,7 @@ function map() {
         }
     }
 
-    function handleBattle(){
+    function handleBattle() {
         if (metMonster()) {
             attackMonster(monster.x, monster.y);
             if (!monster.dead) {
@@ -355,19 +370,6 @@ function map() {
 
     function getLevel() {
         return level;
-    }
-
-    function update() {
-        pickUpItem();
-        handleMonsterMovement();
-        putItems();
-        if (!monster.dead) {
-            putMovableObject(monster);
-        }
-        handleBattle();
-        changePlayerFace();
-        putMovableObject(player);
-        showStatus();
     }
 
     return {
